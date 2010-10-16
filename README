@@ -1,0 +1,16 @@
+oc
+==
+
+What?
+-----
+
+oc is an ooc compiler written in ooc
+
+Unlike rock, it doesn't attempt to satisfy everyone by adding hacks
+to make everything work.
+
+It doesn't even attempt to implement every ooc feature ever, but rather
+find a subset of 'traditional ooc' that is coherent and convenient.
+
+The goal is to make it as elegant as possible, with no unnecessary
+code, with a good design, and avoiding hacks.

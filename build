@@ -1,0 +1,9 @@
+#!/bin/sh
+mkdir -p bin .libs
+if [[ ! -e .libs/NagaQueen.o ]]; then
+  echo "Re-generating naga"
+  greg ../nagaqueen/grammar/nagaqueen.leg > .libs/NagaQueen.c
+  gcc -c -std=c99 -D__OOC_USE_GC__ .libs/NagaQueen.c -o .libs/NagaQueen.o $C_FLAGS
+fi
+echo "Compiling oc"
+OOC_LIBS=.. rock -g -v -sourcepath=source frontend/ParsingPool .libs/NagaQueen.o -o=bin/oc $OOC_FLAGS
