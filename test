@@ -1,0 +1,3 @@
+#!/bin/bash
+
+find samples/ -iname '*.ooc' -exec ./run-test '{}' \;
