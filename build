@@ -2,7 +2,7 @@
 mkdir -p bin .libs
 if [[ ! -e .libs/NagaQueen.o ]]; then
   echo "Re-generating naga"
-  greg ../nagaqueen/grammar/nagaqueen.leg > .libs/NagaQueen.c
+  greg ../nagaqueen/grammar/nagaqueen.leg > .libs/NagaQueen.c || exit
   gcc -c -std=c99 -D__OOC_USE_GC__ .libs/NagaQueen.c -o .libs/NagaQueen.o $C_FLAGS
 fi
 echo "Compiling oc"
