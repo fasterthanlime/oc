@@ -14,7 +14,6 @@ Scope: class extends Node {
 
     resolve: func (task: Task) {
         task queueList(body)
-        task done()
     }
 
     resolveAccess: func (acc: Access, task: Task, suggest: Func (Var)) {
@@ -23,7 +22,9 @@ Scope: class extends Node {
         task walkBackward(|node|
             if(idx == -1 && node instanceOf?(Statement)) {
                 idx = body indexOf(node as Statement)
-                return true // break
+                if(idx != -1) {
+                    return true // break
+                }
             }
             false
         )

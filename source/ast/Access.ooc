@@ -29,8 +29,6 @@ Access: class extends Expression {
         )
         if(!ref)
             Exception new("Undefined symbol `" + name + "`") throw()
-        
-        task done()
     }
 
 }

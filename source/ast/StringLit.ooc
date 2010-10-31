@@ -11,7 +11,6 @@ StringLit: class extends Expression {
 
     resolve: func (task: Task) {
         task queue(type)
-        task done()
     }
 
     getType: func -> Type { type }

@@ -24,7 +24,6 @@ Var: class extends Expression {
         }
 
         task queue(type)
-        task done()
     }
 
     toString: func -> String {

@@ -1,5 +1,5 @@
 
-import os/Coro, structs/[ArrayList, List]
+import os/Coro, structs/[ArrayList, List, Stack]
 
 import ast/[Node, Module]
 import backend/tree/Backend
@@ -16,7 +16,9 @@ Task: class {
     node: Node { get set }
     done?: Bool { get set }
 
-    init: func (=parent, .node) {
+    lastFree := static Stack<This> new()
+
+    init: func ~real (=parent, .node, dummy: Bool) {
         init(parent coro, node)
     }
 
@@ -25,6 +27,20 @@ Task: class {
         id = idSeed
         coro = Coro new()
         done? = false
+        version(OOC_TASK_DEBUG) { "Creating new task %s" printfln(toString() toCString()) }
+    }
+
+    new: static func (.parent, .node) -> This {
+        if(lastFree empty?()) {
+            new~real(parent, node, false)
+        } else {
+            res := lastFree pop()
+            version(OOC_TASK_DEBUG) { ("Re-using last free task " + res toString()) println() }
+            res parent = parent
+            res node = node
+            res done? = false
+            res
+        }
     }
 
     start: func {
@@ -37,15 +53,17 @@ Task: class {
         GC_add_roots   (stackBase, stackBase + stackSize)
 
         parentCoro startCoro(coro, ||
-            node resolve(this)
-            Exception new("Error! task returned - this shouldn't happened") throw()
+            // This allows us to reuse tasks
+            while(this node != null) {
+                version(OOC_TASK_DEBUG) { (toString() + " launching resolve of " + toString()) println() }
+                this node resolve(this)
+                version(OOC_TASK_DEBUG) { (toString() + " finished, yielding " + toString()) println() }
+                this done? = true
+                this node = null
+                This lastFree push(this)
+                yield()
+            }
         )
-    }
-
-    done: func {
-        version(OOC_TASK_DEBUG) { (toString() + " done") println() }
-        done? = true
-        coro switchTo(parentCoro)
     }
 
     yield: func {
@@ -113,7 +131,7 @@ Task: class {
     }
 
     toString: func -> String {
-        "[#%d %s]" format(id, node toString() toCString())
+        "[#%d %s]" format(id, node ? node toString() toCString() : "<no node>" toCString())
     }
 
     walkBackward: func (f: Func (Node) -> Bool) {
@@ -159,7 +177,6 @@ Resolver: class extends Node {
         task queueAll(|queue|
             modules each(|m| queue(m))
         )
-        task done()
     }
 
 }

@@ -7,7 +7,7 @@ import nagaqueen/OocListener
 import ParsingPool
 
 import ast/[Module, FuncDecl, Call, Statement, Type, Expression,
-    Var, Access, StringLit, Import]
+    Var, Access, StringLit, Import, Node]
 import middle/Resolver
 
 /**
@@ -58,7 +58,13 @@ AstBuilder: class extends OocListener {
 
     stackString: func -> String {
         b := Buffer new()
-        stack each(|el|)
+        stack each(|el|
+            b append(match el {
+                case n: Node => n toString()
+                case         => el class name
+            }). append("->")
+        )
+        b toString()
     }
 
     /*
@@ -82,15 +88,21 @@ AstBuilder: class extends OocListener {
      * Functions
      */
     onFunctionStart: func (name, doc: CString) {
-        if(!name toString() empty?()) {
-            ""
-        }
         fd := FuncDecl new()
+        fd name = name toString()
         stack push(fd)
     }
 
     onFunctionEnd: func -> FuncDecl {
-        pop(FuncDecl)
+        fd := pop(FuncDecl)
+        ("End of function, stack = " + stackString()) println()
+        if(stack peek() instanceOf?(Module)) {
+            var := Var new(fd name)
+            fd name = ""
+            var expr = fd
+            onStatement(var)
+        }
+        fd
     }
 
     onFunctionArgsStart: func {
@@ -192,8 +204,10 @@ AstBuilder: class extends OocListener {
         node := stack peek()
         match node {
             case fd: FuncDecl =>
+                //"Got statement %s in function %s" printfln(statement toString() toCString(), fd toString() toCString())
                 fd body add(statement)
             case mod: Module =>
+                "Got statement %s in module body" printfln(statement toString() toCString())
                 mod body add(statement)
             case =>
                 ("Don't know how to react to statement " + statement toString() +

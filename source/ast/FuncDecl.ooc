@@ -11,7 +11,11 @@ FuncDecl: class extends Expression {
     args := ArrayList<Var> new()
     retType := BaseType new("void")
 
-    init: func ~fDecl {}
+    name: String { get set }
+
+    init: func ~fDecl {
+        name = ""
+    }
 
     resolve: func (task: Task) {
         task queueList(args)
@@ -19,7 +23,6 @@ FuncDecl: class extends Expression {
         resolved = true // artificial testing
         
         task queue(body)
-        task done()
     }
 
     toString: func -> String {

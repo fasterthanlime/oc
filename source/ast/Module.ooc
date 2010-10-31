@@ -29,7 +29,6 @@ Module: class extends Node {
 
     resolve: func (task: Task) {
         task queue(body)
-        task done()
     }
 
     getDeps: func (list := ArrayList<Module> new()) -> List<Module> {

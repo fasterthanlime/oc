@@ -18,7 +18,6 @@ Call: class extends Statement {
     resolve: func (task: Task) {
         task queueList(args)
         task queue(subject)
-        task done()
     }
 
     toString: func -> String {

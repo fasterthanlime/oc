@@ -19,7 +19,6 @@ BaseType: class extends Type {
 
     resolve: func (task: Task) {
         resolved = true
-        task done()
     }
 
 }
