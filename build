@@ -6,4 +6,5 @@ if [[ ! -e .libs/NagaQueen.o ]]; then
   gcc -c -std=c99 -D__OOC_USE_GC__ .libs/NagaQueen.c -o .libs/NagaQueen.o $C_FLAGS
 fi
 echo "Compiling oc"
-OOC_LIBS=.. rock -g -v -sourcepath=source frontend/ParsingPool .libs/NagaQueen.o -o=bin/oc $OOC_FLAGS
+#OOC_LIBS=.. OOC_DIST=/blue/Dev/rock gdb --args rock -allerrors -g -v -sourcepath=source frontend/ParsingPool .libs/NagaQueen.o -o=bin/oc $OOC_FLAGS
+OOC_LIBS=.. rock -allerrors -g -v -debuglibcache -sourcepath=source frontend/ParsingPool .libs/NagaQueen.o -o=bin/oc $OOC_FLAGS
