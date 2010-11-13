@@ -20,18 +20,18 @@ CSource: class {
         if(!baseFile exists?()) baseFile mkdirs()
         hw := OcWriter new(FileWriter new(File new(baseFile, name + ".h")))
 
-	define := "__" + name toUpper() + "__define__"
-	hw nl(). app("#ifndef "). app(define)
-	hw nl(). app("#define "). app(define)
+	    define := "__" + name toUpper() + "__define__"
+	    hw nl(). app("#ifndef "). app(define)
+	    hw nl(). app("#define "). app(define)
 
-	includes each(|i| hw nl(). app("#include "). app(i))
+	    includes each(|i| hw nl(). app("#include "). app(i))
 
-	hw nl(). app("#endif")
+	    hw nl(). app("#endif")
 
         hw close()
         
         cw := OcWriter new(FileWriter new(File new(baseFile, name + ".c")))
-	cw nl(). app("#include \""). app(name). app(".h\"")
+        cw nl(). app("#include \""). app(name). app(".h\"")
 
         types     each(|t| t write(cw))
         functions each(|f| f write(cw))
@@ -50,10 +50,10 @@ CFunction: class {
     init: func (=returnType, =name) {}
 
     write: func (w: OcWriter) {
-	w nl(). nl()
+    	w nl(). nl()
         returnType write(w)
         w app(" "). app(name)
-        w writeEach(args, "(", ", ", ")", |arg| arg write(w))
+        w writeEach(args, "(", ", ", ") ", |arg| arg write(w))
         w writeBlock(body, ";", |stat| stat write(w))
     }
 
@@ -63,6 +63,38 @@ CStatement: abstract class {
     
     write: abstract func (oc: OcWriter)
     
+}
+
+nop := CNop new()
+
+CNop: class extends CStatement {
+    
+    write: func (oc: OcWriter) {}
+    
+}
+
+CBlock: class extends CStatement {
+    body := ArrayList<CStatement> new()
+    
+    init: func {}
+    
+    write: func (w: OcWriter) {
+        w writeBlock(body, ";", |stat| stat write(w))
+    }
+}
+
+CReturn: class extends CStatement {
+    expr: CExpr
+    
+    init: func (=expr) {}
+    
+    write: func (w: OcWriter) {
+        w app("return")
+        if(expr) {
+            w app(" ")
+            expr write(w)
+        }
+    }
 }
 
 CExpr: abstract class extends CStatement {
@@ -215,7 +247,7 @@ CIntLiteral: class extends CExpr {
 
 }
 
-str: func (val: String) -> CExpr { CStringLiteral new(val) }
+str: func (val: String) -> CStringLiteral { CStringLiteral new(val) }
 
 CStringLiteral: class extends CExpr {
     val: String

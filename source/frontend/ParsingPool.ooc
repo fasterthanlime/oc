@@ -9,7 +9,7 @@ import threading/Thread, structs/[List, ArrayList], os/[Time, System]
 main: func (argc: Int, argv: CString*) {
 
     if(argc <= 1) {
-        "Usage: oc FILE" println()
+        "Usage: oc file.ooc" println()
         exit(1)
     }
     
@@ -118,7 +118,7 @@ ParserWorker: class {
                 job := pool pop()
                 if(job) {
                     busy = true
-                    "[%d] Parsing %s" printfln(id, job path toCString())
+                    "[%d] Parsing %s" printfln(id, job path)
                     builder := AstBuilder new(pool)
                     builder parse(job path)
                     job module = builder module

@@ -2,7 +2,7 @@
 import os/Coro, structs/[ArrayList, List, Stack]
 
 import ast/[Node, Module]
-import backend/tree/Backend
+import backend/c89/Backend
 
 Task: class {
     id: Int { get set }
@@ -27,7 +27,7 @@ Task: class {
         id = idSeed
         coro = Coro new()
         done? = false
-        version(OOC_TASK_DEBUG) { "Creating new task %s" printfln(toString() toCString()) }
+        version(OOC_TASK_DEBUG) { "Creating new task %s" printfln(toString()) }
     }
 
     new: static func (.parent, .node) -> This {
@@ -131,7 +131,7 @@ Task: class {
     }
 
     toString: func -> String {
-        "[#%d %s]" format(id, node ? node toString() toCString() : "<no node>" toCString())
+        "[#%d %s]" format(id, node ? node toString() : "<no node>")
     }
 
     walkBackward: func (f: Func (Node) -> Bool) {

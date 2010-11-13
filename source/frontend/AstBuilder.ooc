@@ -107,6 +107,7 @@ AstBuilder: class extends OocListener {
 
     onFunctionArgsStart: func {
         stack push(peek(FuncDecl) args)
+        
     }
 
     onFunctionArgsEnd: func {
@@ -121,6 +122,8 @@ AstBuilder: class extends OocListener {
     onFunctionAttr: func (f: FuncAttributes, value: CString = null) {
         fd := peek(FuncDecl)
         match f {
+            case FuncAttributes _extern =>
+                fd externName = value toString()
             case =>
                 "Unknown function attribute %d" printfln(f)
         }
@@ -204,10 +207,10 @@ AstBuilder: class extends OocListener {
         node := stack peek()
         match node {
             case fd: FuncDecl =>
-                //"Got statement %s in function %s" printfln(statement toString() toCString(), fd toString() toCString())
+                //"Got statement %s in function %s" printfln(statement toString(), fd toString())
                 fd body add(statement)
             case mod: Module =>
-                "Got statement %s in module body" printfln(statement toString() toCString())
+                "Got statement %s in module body" printfln(statement toString())
                 mod body add(statement)
             case =>
                 ("Don't know how to react to statement " + statement toString() +

@@ -20,5 +20,7 @@ BaseType: class extends Type {
     resolve: func (task: Task) {
         resolved = true
     }
+    
+    toString: func -> String { name }
 
 }

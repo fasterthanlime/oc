@@ -10,11 +10,13 @@ FuncDecl: class extends Expression {
     body := Scope new()
     args := ArrayList<Var> new()
     retType := BaseType new("void")
-
+    
+    externName: String { get set }
     name: String { get set }
 
     init: func ~fDecl {
         name = ""
+        externName = null
     }
 
     resolve: func (task: Task) {

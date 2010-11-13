@@ -55,7 +55,7 @@ OcWriter: class {
     }
 
     writeTabs: func {
-        stream write(" " times (tabLevel * tabWidth) toCString(), tabLevel * tabWidth)
+        stream write(" " times (tabLevel * tabWidth), tabLevel * tabWidth)
     }
 
     newUntabbedLine: func {

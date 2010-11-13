@@ -16,7 +16,7 @@ main: func {
     stru := CStructDecl new("hello_data")
     stru elements add(var(type("char*"), "name")).
 		  add(var(type("int"), "age"))
-    s types add(stru) 
+    s types add(stru)
 
     mainFunc body add(assign(var(stru type pointer(), "john_doe"), call("malloc", call("sizeof", stru type)))).
 		  add(assign(accArrow(acc("john_doe"), "name"), str("John Doe"))).
