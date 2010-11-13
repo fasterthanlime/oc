@@ -34,7 +34,7 @@ Backend: class extends StackBackend {
     
     visitModule: func (m: Module) {
         ("Visiting module " + m fullName) println()
-        loadFunc := CFunction new(type("void"), m fullName replaceAll("/", "_"))
+        loadFunc := CFunction new(type("void"), "__" + m fullName replaceAll("/", "_") + "__")
         source functions add(loadFunc)
         loadFunc body addAll(visitScope(m body))
         
