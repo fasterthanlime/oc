@@ -1,7 +1,7 @@
 
 
 import middle/Resolver
-import Expression, Type, Var
+import Expression, Type, Var, Node, Scope, Statement
 
 Access: class extends Expression {
 
@@ -27,6 +27,7 @@ Access: class extends Expression {
             )
             (ref != null) // break if resolved
         )
+        
         if(!ref)
             Exception new("Undefined symbol `" + name + "`") throw()
     }

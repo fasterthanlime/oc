@@ -25,8 +25,9 @@ Backend: class extends StackBackend {
         source = CSource new(module fullName)
     	push(source)
         
-        put(Call, |c| visitCall(c as Call))
-        put(Var,  |v| visitVar(v as Var))
+        put(Call,  |c| visitCall(c as Call))
+        put(Var,   |v| visitVar(v as Var))
+        put(Access,|a| visitAccess(a as Access))
         put(StringLit, |sl| visitStringLit(sl as StringLit))
         
     	visitModule(module)
@@ -86,6 +87,10 @@ Backend: class extends StackBackend {
         }
         nop
 	}
+    
+    visitAccess: func (a: Access) -> CAccess {
+        CAccess new(a expr ? visitExpr(a expr) : null, a name)
+    }
     
     visitStringLit: func (s: StringLit) -> CStringLiteral {
         str(EscapeSequence unescape(s value))

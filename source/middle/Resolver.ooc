@@ -1,5 +1,5 @@
 
-import os/Coro, structs/[ArrayList, List, Stack]
+import os/Coro, structs/[ArrayList, List, Stack, HashBag]
 
 import ast/[Node, Module]
 import backend/c89/Backend
@@ -15,6 +15,8 @@ Task: class {
     
     node: Node { get set }
     done?: Bool { get set }
+    
+    userdata: HashBag
 
     lastFree := static Stack<This> new()
 
@@ -41,6 +43,25 @@ Task: class {
             res done? = false
             res
         }
+    }
+    
+    /**
+     * Set userdata to this task
+     */
+    set: func <T> (key: String, value: T) {
+        if(!userdata) userdata = HashBag new()
+        userdata put(key, value)
+    }
+    
+    has: func (key: String) -> Bool {
+        if(!userdata) return false
+        userdata contains?(key)
+    }
+    
+    get: func <T> (key: String, T: Class) -> T {
+        if(userdata) {
+            return userdata get(key, T)
+        } else null
     }
 
     start: func {
@@ -86,19 +107,20 @@ Task: class {
 
     queueList: func (l: List<Node>) {
         pool := ArrayList<Node> new()
-        l each(|n| spawn(n, pool))
+        l each(|n, i| spawn(n, i, pool))
         exhaust(pool)
     }
 
-    queueAll: func (f: Func (Func (Node))) {
+    queueAll: func (f: Func (Func (Node, Int))) {
         pool := ArrayList<Node> new()
-        f(|n| spawn(n, pool))
+        f(|n, i| spawn(n, i, pool))
         exhaust(pool)
     }
 
-    spawn: func (n: Node, pool: List<Task>) {
+    spawn: func (n: Node, index: Int, pool: List<Task>) {
         version(OOC_TASK_DEBUG) {  (toString() + " spawning for " + n toString()) }
         task := Task new(this, n)
+        task set("index", index)
         task start()
         if(!task done?) pool add(task)
     }
@@ -139,6 +161,12 @@ Task: class {
         if(parent)
             parent walkBackward(f)
     }
+    
+    walkBackwardTasks: func ~withTask (f: Func (Task) -> Bool) {
+        if(f(this)) return // true = break
+        if(parent)
+            parent walkBackwardTasks(f)
+    }
 }
 
 Resolver: class extends Node {
@@ -174,9 +202,12 @@ Resolver: class extends Node {
     }
 
     resolve: func (task: Task) {
+        task queueList(modules)
+        /*
         task queueAll(|queue|
-            modules each(|m| queue(m))
+            modules each(|m, i| queue(m, i))
         )
+        */
     }
 
 }
