@@ -16,10 +16,12 @@ Var: class extends Expression {
     }
 
     resolve: func (task: Task) {
-        if(!type) {
+        if(!_type) {
             task queue(expr)
+            "expr = %p, class = %s" printfln(expr, expr class name)
+            "and expr = %s" printfln(expr toString())
             _type = expr getType()
-            if(!type)
+            if(!_type)
                 Exception new("Couldn't resolve type of " + toString()) throw()
         }
 

@@ -7,7 +7,7 @@ import nagaqueen/OocListener
 import ParsingPool
 
 import ast/[Module, FuncDecl, Call, Statement, Type, Expression,
-    Var, Access, StringLit, Import, Node]
+    Var, Access, StringLit, NumberLit, Import, Node]
 import middle/Resolver
 
 /**
@@ -95,7 +95,6 @@ AstBuilder: class extends OocListener {
 
     onFunctionEnd: func -> FuncDecl {
         fd := pop(FuncDecl)
-        ("End of function, stack = " + stackString()) println()
         if(stack peek() instanceOf?(Module)) {
             var := Var new(fd name)
             fd name = ""
@@ -186,6 +185,10 @@ AstBuilder: class extends OocListener {
     onStringLiteral: func (text: CString) -> StringLit {
         StringLit new(text toString())
     }
+    
+    onIntLiteral: func (format: IntFormat, value: CString) -> NumberLit {
+        NumberLit new(format, value toString())
+    }
 
     onVarAccess: func (expr: Expression, name: CString) -> Access {
         Access new(expr, name toString())
@@ -210,7 +213,7 @@ AstBuilder: class extends OocListener {
                 //"Got statement %s in function %s" printfln(statement toString(), fd toString())
                 fd body add(statement)
             case mod: Module =>
-                "Got statement %s in module body" printfln(statement toString())
+                //"Got statement %s in module body" printfln(statement toString())
                 mod body add(statement)
             case =>
                 ("Don't know how to react to statement " + statement toString() +

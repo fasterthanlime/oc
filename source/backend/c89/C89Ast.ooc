@@ -20,7 +20,7 @@ CSource: class {
         if(!baseFile exists?()) baseFile mkdirs()
         hw := OcWriter new(FileWriter new(File new(baseFile, name + ".h")))
 
-	    define := "__" + name toUpper() + "__define__"
+	    define := "__" + name map(|c| c alphaNumeric?() ? c toUpper() : '_') + "__define__"
 	    hw nl(). app("#ifndef "). app(define)
 	    hw nl(). app("#define "). app(define)
 
@@ -237,12 +237,16 @@ CCall: class extends CExpr {
 int: func (val: Int64) -> CIntLiteral { CIntLiteral new(val) }
 
 CIntLiteral: class extends CExpr {
-    val: Int64
+    val: String
 
-    init: func(=val) {}
+    init: func ~fromInt (intVal: Int64) {
+        val = "%Ld" format(val)
+    }
+    
+    init: func (=val) {}
 
     write: func (w: OcWriter) {
-	w app("%Ld" format(val))
+        w app(val)
     }
 
 }

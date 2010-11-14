@@ -2,7 +2,7 @@
 import structs/[ArrayList, List]
 
 import middle/Resolver
-import Node, FuncDecl, Call, Import, Scope
+import Node, FuncDecl, Call, Import, Scope, Access, Var
 
 /**
  * A module contains types, functions, global variables.
@@ -19,10 +19,11 @@ Module: class extends Node {
      */
     fullName: String
 
-    /** List of functions in thie module that don't belong to any type */
     body := Scope new()
 
     imports := ArrayList<Import> new()
+
+    main? : Bool { get set }
     
     init: func (=fullName) {}
 
@@ -39,6 +40,21 @@ Module: class extends Node {
             }
         )
         list
+    }
+    
+    resolveAccess: func (acc: Access, task: Task, suggest: Func (Var)) {
+        //"Resolving %s in %s, with %d import, task is %s" printfln(acc toString(), toString(), imports size, task toString())
+        
+        task set("noindex", true)
+        for(imp in imports) {
+            imp module body resolveAccess(acc, task, suggest)
+            if(acc ref) break
+        }
+        task unset("noindex")
+    }
+    
+    toString: func -> String {
+        "module " + fullName
     }
 
 }

@@ -2,7 +2,6 @@
 import os/Coro, structs/[ArrayList, List, Stack, HashBag]
 
 import ast/[Node, Module]
-import backend/c89/Backend
 
 Task: class {
     id: Int { get set }
@@ -51,6 +50,11 @@ Task: class {
     set: func <T> (key: String, value: T) {
         if(!userdata) userdata = HashBag new()
         userdata put(key, value)
+    }
+    
+    unset: func (key: String) {
+        if(!userdata) return
+        userdata remove(key)
     }
     
     has: func (key: String) -> Bool {
@@ -192,22 +196,10 @@ Resolver: class extends Node {
             
             mainCoro switchTo(mainTask coro)
         }
-        "All done resolving!" println()
-        "=================================" println()
-
-        modules each(|module|
-            b := Backend new(module)
-            b generate()
-        )
     }
 
     resolve: func (task: Task) {
         task queueList(modules)
-        /*
-        task queueAll(|queue|
-            modules each(|m, i| queue(m, i))
-        )
-        */
     }
 
 }

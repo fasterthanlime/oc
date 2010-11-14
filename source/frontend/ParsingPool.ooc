@@ -6,27 +6,6 @@ import middle/Resolver
 
 import threading/Thread, structs/[List, ArrayList], os/[Time, System]
 
-main: func (argc: Int, argv: CString*) {
-
-    if(argc <= 1) {
-        "Usage: oc file.ooc" println()
-        exit(1)
-    }
-    
-    "Parsing %s" printfln(argv[1])
-    pool := ParsingPool new()
-    mainJob := ParsingJob new(argv[1] toString(), null)
-    pool push(mainJob)
-    pool exhaust()
-    "Done parsing!" println()
-    "=================================" println()
-
-    r := Resolver new()
-    r modules addAll(mainJob module getDeps())
-    r start()
-    
-}
-
 ParsingJob: class {
 
     path: String
@@ -112,13 +91,13 @@ ParserWorker: class {
 
     run: func {
         Thread new(||
-            "[%d] Initialized" printfln(id)
+            //"Born [%d]" printfln(id)
 
             while (pool active) {
                 job := pool pop()
                 if(job) {
                     busy = true
-                    "[%d] Parsing %s" printfln(id, job path)
+                    "Parsing %s [%d]" printfln(job path, id)
                     builder := AstBuilder new(pool)
                     builder parse(job path)
                     job module = builder module
@@ -130,7 +109,7 @@ ParserWorker: class {
                 }
             }
 
-            "Ending worker thread %d" printfln(id)
+            //"Dying [%d]" printfln(id)
         ) start()
     }
     

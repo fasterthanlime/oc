@@ -2,9 +2,9 @@
 import structs/[List, ArrayList]
 
 import middle/Resolver
-import Statement, FuncDecl, Expression, Access
+import FuncDecl, Expression, Access, Type
 
-Call: class extends Statement {
+Call: class extends Expression {
 
     subject: Access { get set }
     args: List<Expression> { get set }
@@ -22,6 +22,17 @@ Call: class extends Statement {
 
     toString: func -> String {
         subject toString() + "()"
+    }
+    
+    getType: func -> Type {
+        sType := subject getType()
+        if(sType) match (sType) {
+            case ft: FuncType =>
+                return ft proto retType
+            case =>
+                Exception new("Trying to call something that's not a function! " + sType toString())
+        }
+        null
     }
 
 }

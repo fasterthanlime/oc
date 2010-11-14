@@ -1,6 +1,6 @@
 
 import ast/[Module, Node, FuncDecl, Access, Var, Scope, Type,
-    Call, StringLit, Statement, Expression]
+    Call, StringLit, NumberLit, Statement, Expression]
 import text/EscapeSequence
 
 import structs/[HashMap, ArrayList, List]
@@ -29,31 +29,34 @@ Backend: class extends StackBackend {
         put(Var,   |v| visitVar(v as Var))
         put(Access,|a| visitAccess(a as Access))
         put(StringLit, |sl| visitStringLit(sl as StringLit))
+        put(NumberLit, |sl| visitNumberLit(sl as NumberLit))
         
     	visitModule(module)
     }
     
     visitModule: func (m: Module) {
         ("Visiting module " + m fullName) println()
-        loadFunc := CFunction new(type("void"), "__" + m fullName replaceAll("/", "_") + "__")
+        loadFunc := CFunction new(type("void"), "__" + m fullName map(|c| c alphaNumeric?() ? c : '_') + "__")
         source functions add(loadFunc)
         loadFunc body addAll(visitScope(m body))
         
-        main : CFunction = null
-        for(f in source functions) {
-            if(f name == "main") {
-                main = f
-                break
+        if(m main?) {
+            main : CFunction = null
+            for(f in source functions) {
+                if(f name == "main") {
+                    main = f
+                    break
+                }
             }
+            if(!main) {
+                main = CFunction new(type("int"), "main")
+                main args add(var(type("int"), "argc")).
+                          add(var(type("char**"), "argv"))
+                source functions add(main)
+                main body add(CReturn new(int(0)))
+            }
+            main body add(0, call(loadFunc name))
         }
-        if(!main) {
-            main = CFunction new(type("int"), "main")
-            main args add(var(type("int"), "argc")).
-                      add(var(type("char**"), "argv"))
-            source functions add(main)
-            main body add(CReturn new(int(0)))
-        }
-        main body add(0, call(loadFunc name))
     }
     
     visitCall: func(c: Call) -> CStatement {
@@ -94,6 +97,10 @@ Backend: class extends StackBackend {
     
     visitStringLit: func (s: StringLit) -> CStringLiteral {
         str(EscapeSequence unescape(s value))
+    }
+    
+    visitNumberLit: func (n: NumberLit) -> CIntLiteral {
+        CIntLiteral new(n value)
     }
     
     visitScope: func (s: Scope) -> ArrayList<CStatement> {

@@ -10,6 +10,7 @@ FuncDecl: class extends Expression {
     body := Scope new()
     args := ArrayList<Var> new()
     retType := BaseType new("void")
+    _type: FuncType
     
     externName: String { get set }
     name: String { get set }
@@ -17,6 +18,7 @@ FuncDecl: class extends Expression {
     init: func ~fDecl {
         name = ""
         externName = null
+        _type = FuncType new(this)
     }
 
     resolve: func (task: Task) {
@@ -32,7 +34,7 @@ FuncDecl: class extends Expression {
     }
 
     getType: func -> Type {
-        BaseType new("Func")
+        _type
     }
 
 }
