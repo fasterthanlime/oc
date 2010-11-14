@@ -1,0 +1,3 @@
+import sayhi-lib
+
+sayHi()
