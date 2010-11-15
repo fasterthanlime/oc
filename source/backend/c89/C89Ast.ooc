@@ -2,9 +2,29 @@ import io/[File, FileWriter, OcWriter], structs/[List, ArrayList]
 import text/EscapeSequence
 
 /**
+ * Base class for any C node
+ */
+CNode: abstract class {
+    
+    seed := static 0
+    
+    /**
+     * Generate a unique name that contains 'base'.
+     * 
+     * Subclasses should override this to provide better/shorter names
+     * that are still unique.
+     */
+    genName: func (base: String) -> String {
+        seed += 1
+        "__%s_%d" format(base, seed)
+    }
+    
+}
+
+/**
  * A source is a combination of .c/.h file
  */
-CSource: class {
+CSource: class extends CNode {
 
     name: String
 
@@ -25,6 +45,12 @@ CSource: class {
 	    hw nl(). app("#define "). app(define)
 
 	    includes each(|i| hw nl(). app("#include "). app(i))
+        
+        functions each(|f|
+            hw nl()
+            f writePrototype(hw)
+            hw app(';')
+        )
 
 	    hw nl(). app("#endif")
 
@@ -40,7 +66,7 @@ CSource: class {
 
 }
 
-CFunction: class {
+CFunction: class extends CNode {
 
     returnType: CType
     name: String
@@ -49,27 +75,25 @@ CFunction: class {
 
     init: func (=returnType, =name) {}
 
+    writePrototype: func (w: OcWriter) {
+        returnType write(w, |w|
+            w app(' '). app(name)
+            w writeEach(args, "(", ", ", ")", |arg| arg write(w))
+        )
+    }
+
     write: func (w: OcWriter) {
     	w nl(). nl()
-        returnType write(w)
-        w app(" "). app(name)
-        w writeEach(args, "(", ", ", ") ", |arg| arg write(w))
+        writePrototype(w)
+        w app(' ')
         w writeBlock(body, ";", |stat| stat write(w))
     }
 
 }
 
-CStatement: abstract class {
+CStatement: abstract class extends CNode {
     
     write: abstract func (oc: OcWriter)
-    
-}
-
-nop := CNop new()
-
-CNop: class extends CStatement {
-    
-    write: func (oc: OcWriter) {}
     
 }
 
@@ -101,6 +125,11 @@ CExpr: abstract class extends CStatement {
 
 }
 
+nop := CNop new()
+
+CNop: class extends CExpr {
+    write: func (oc: OcWriter) {}    
+}
 
 var: func (type: CType, name: String) -> CVariable { CVariable new(type, name) }
 
@@ -109,12 +138,13 @@ CVariable: class extends CExpr {
     type: CType
     name: String
     expr: CExpr = null
+    
+    shallow? : Bool { get set }
 
     init: func(=type, =name) {}
 
     write: func (w: OcWriter) {
-        type write(w)
-        w app(" "). app(name)
+        type write(w, name)
         if(expr) {
             w app(" = ")
             expr write(w)
@@ -286,7 +316,7 @@ CStructDecl: class extends CTypeDecl {
     write: func (w: OcWriter) {
         w nl(). nl(). app("struct "). app(name)
         w writeBlock(elements, ";", |stat| stat write(w))
-	w app(';')
+        w app(';')
     }
 
     getType: func -> CType { type }
@@ -294,10 +324,19 @@ CStructDecl: class extends CTypeDecl {
 }
 
 CType: abstract class extends CExpr {
-    write: abstract func (w: OcWriter) {}
+    
+    write: abstract func ~withAnon (w: OcWriter, writeMid: Func (OcWriter))
+    
+    write: func ~withName (w: OcWriter, varName: String) {
+        write(w, |w| w app(' '). app(varName))
+    }
+    
+    write: func (w: OcWriter) {
+        write(w, |w|)
+    }
 
     pointer: func -> CPointerType {
-	CPointerType new(this)
+        CPointerType new(this)
     }
 }
 
@@ -308,10 +347,28 @@ CBaseType: class extends CType {
     name: String
     init: func(=name) {}
 
-    write: func (w: OcWriter) {
+    write: func ~withAnon (w: OcWriter, writeMid: Func (OcWriter)) {
         w app(name)
+        writeMid(w)
     }
 
+}
+
+CFuncType: class extends CType {
+    
+    argTypes := ArrayList<CType> new()
+    retType: CType
+    
+    init: func (=retType) {}
+    
+    write: func ~withAnon (w: OcWriter, writeMid: Func (OcWriter)) {
+        retType write(w)
+        w app(" (*")
+        writeMid(w)
+        w app(")")
+        w writeEach(argTypes, "(", ", ", ")", |argType| argType write(w))
+    }
+    
 }
 
 CPointerType: class extends CType {
@@ -319,9 +376,10 @@ CPointerType: class extends CType {
     inner: CType
     init: func(=inner) {}
 
-    write: func (w: OcWriter) {
-	inner write(w)
-	w app('*')
+    write: func ~withAnon (w: OcWriter, writeMid: Func (OcWriter)) {
+        inner write(w)
+        w app('*')
+        writeMid(w)
     }
 
 }

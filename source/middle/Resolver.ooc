@@ -109,7 +109,7 @@ Task: class {
         }
     }
 
-    queueList: func (l: List<Node>) {
+    queueList: func (l: Iterable<Node>) {
         pool := ArrayList<Node> new()
         l each(|n, i| spawn(n, i, pool))
         exhaust(pool)

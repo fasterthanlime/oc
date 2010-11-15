@@ -34,6 +34,8 @@ FuncType: class extends Type {
     // well, nothing to do
     resolve: func (task: Task) {}
     
+    toString: func -> String { "Func " + proto toString() }
+    
 }
 
 

@@ -1,6 +1,6 @@
 
 import ast/[Module, Node, FuncDecl, Access, Var, Scope, Type,
-    Call, StringLit, NumberLit, Statement, Expression]
+    Call, StringLit, NumberLit, Statement, Expression, Return]
 import text/EscapeSequence
 
 import structs/[HashMap, ArrayList, List]
@@ -28,6 +28,8 @@ Backend: class extends StackBackend {
         put(Call,  |c| visitCall(c as Call))
         put(Var,   |v| visitVar(v as Var))
         put(Access,|a| visitAccess(a as Access))
+        put(Return,|r| visitReturn(r as Return))
+        put(FuncDecl, |fd| visitFuncDecl(fd as FuncDecl))
         put(StringLit, |sl| visitStringLit(sl as StringLit))
         put(NumberLit, |sl| visitNumberLit(sl as NumberLit))
         
@@ -38,7 +40,11 @@ Backend: class extends StackBackend {
         ("Visiting module " + m fullName) println()
         loadFunc := CFunction new(type("void"), "__" + m fullName map(|c| c alphaNumeric?() ? c : '_') + "__")
         source functions add(loadFunc)
-        loadFunc body addAll(visitScope(m body))
+        
+        visitScope(m body) each(|stat|
+            if(stat class == CVariable && stat as CVariable shallow?) return
+            loadFunc body add(stat)
+        )
         
         if(m main?) {
             main : CFunction = null
@@ -59,6 +65,10 @@ Backend: class extends StackBackend {
         }
     }
     
+    visitReturn: func (r: Return) -> CReturn {
+        CReturn new(r expr ? visitExpr(r expr) : null)
+    }
+    
     visitCall: func(c: Call) -> CStatement {
         "Visiting call %s" printfln(c toString())
         match (c subject) {
@@ -73,23 +83,44 @@ Backend: class extends StackBackend {
         }
     }
     
-    visitVar: func (v: Var) -> CStatement {
+    visitVar: func (v: Var) -> CVariable {
         match (v expr) {
             case null =>    	           
-                return var(ctype(v type), v name)
-            case fd: FuncDecl =>
-                if(!fd externName) {
-                    cf := CFunction new(ctype(fd retType), v name)
-                    cf body addAll(visitScope(fd body))
-                    source functions add(cf)
-                }
+                var(ctype(v type), v name)
             case =>
 	            cv := var(ctype(v type), v name)
+                push(cv)
 	            cv expr = visitExpr(v expr)
-                return cv
+                pop(CVariable)
         }
-        nop
 	}
+    
+    visitFuncDecl: func (fd: FuncDecl) -> CAccess {
+        name := fd name
+        if(name empty?()) {
+            match (stack peek()) {
+                case v: CVariable =>
+                    name = v name
+                    v shallow? = true
+                case =>
+                    // just generate a garbage name
+                    name = stack peek() genName("anonfunc")
+            }
+        }
+        
+        visitFuncDeclWithName(fd, name)
+    }
+    
+    visitFuncDeclWithName: func (fd: FuncDecl, name: String) -> CAccess {
+        cf := CFunction new(ctype(fd retType), name)
+        push(cf)
+        fd args each(|arg| cf args add(visitVar(arg)))
+        cf body addAll(visitScope(fd body))
+        pop(CFunction)
+        
+        if(!fd externName) source functions add(cf)
+        acc(name)
+    }
     
     visitAccess: func (a: Access) -> CAccess {
         CAccess new(a expr ? visitExpr(a expr) : null, a name)
@@ -116,6 +147,11 @@ Backend: class extends StackBackend {
         match t {
             case b: BaseType =>
                 type(b name)
+            case f: FuncType =>
+                "ctype-ing functype %s" printfln(f toString())
+                cf := CFuncType new(ctype(f proto retType))
+                f proto args each(|arg| cf argTypes add(ctype(arg getType())))
+                cf
             case =>
                 Exception new("Unknown type " + t toString() + ", assuming void") throw()
                 null

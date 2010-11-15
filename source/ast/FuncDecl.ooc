@@ -1,14 +1,15 @@
 
-import structs/ArrayList
+import structs/HashMap
 
-import Expression, Statement, Scope, Var, Type
+import Expression, Statement, Scope, Var, Type, Access
 import middle/Resolver
 
 FuncDecl: class extends Expression {
 
     resolved := false
     body := Scope new()
-    args := ArrayList<Var> new()
+    args := HashMap<String, Var> new()
+    
     retType := BaseType new("void")
     _type: FuncType
     
@@ -28,9 +29,24 @@ FuncDecl: class extends Expression {
         
         task queue(body)
     }
+    
+    resolveAccess: func (acc: Access, task: Task, suggest: Func (Var)) {
+        v := args get(acc name)
+        if(v) suggest(v)
+    }
 
     toString: func -> String {
-        "func"
+        b := Buffer new()
+        b append("func (")
+        first := true
+        for(arg in args) {
+            if(first) first = false
+            else      b append(", ")
+            b append(arg toString())
+        }
+        b append(") -> ")
+        b append(retType toString())
+        b toString()
     }
 
     getType: func -> Type {

@@ -1,11 +1,11 @@
 
-import structs/Stack
+import structs/Stack, C89Ast
 
 StackBackend: class {
 
-    stack := Stack<Object> new()
+    stack := Stack<CNode> new()
 
-    push: func (o: Object) {
+    push: func (o: CNode) {
         stack push(o)
     }
 

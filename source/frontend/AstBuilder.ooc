@@ -1,13 +1,13 @@
 use nagaqueen
 
-import structs/Stack, io/File
+import structs/[Stack, List, HashMap], io/File
 
 import nagaqueen/OocListener
 
 import ParsingPool
 
 import ast/[Module, FuncDecl, Call, Statement, Type, Expression,
-    Var, Access, StringLit, NumberLit, Import, Node]
+    Var, Access, StringLit, NumberLit, Import, Node, Return]
 import middle/Resolver
 
 /**
@@ -179,6 +179,30 @@ AstBuilder: class extends OocListener {
     onTypeNew: func (name: CString) -> Type {
         BaseType new(name toString())
     }
+    
+    // FuncType
+
+    onFuncTypeNew: func -> Object {
+        FuncType new(FuncDecl new())
+    }
+
+    onFuncTypeGenericArgument: func (type: FuncType, name: CString) {
+        "Got generic argument <%s> for funcType %s" printfln(name, type toString())
+    }
+
+    onFuncTypeArgument: func (funcType: FuncType, argType: Type) {
+        "Got typeArgument %s" printfln(argType toString())
+        funcType proto args put("", v := Var new(""). setType(argType))
+    }
+
+    onFuncTypeVarArg: func (funcType: Object) {
+        UnsupportedAstElement new(class, "func-type-vararg") throw()
+    }
+
+    onFuncTypeReturnType: func (funcType: FuncType, returnType: Type) {
+        "Got returnType %s" printfln(returnType toString())
+        funcType proto retType = returnType
+    }
 
     /* Various expression/statements */
     
@@ -188,6 +212,10 @@ AstBuilder: class extends OocListener {
     
     onIntLiteral: func (format: IntFormat, value: CString) -> NumberLit {
         NumberLit new(format, value toString())
+    }
+    
+    onReturn: func (expr: Expression) -> Statement {
+        Return new(expr)
     }
 
     onVarAccess: func (expr: Expression, name: CString) -> Access {
@@ -216,8 +244,23 @@ AstBuilder: class extends OocListener {
                 //"Got statement %s in module body" printfln(statement toString())
                 mod body add(statement)
             case =>
-                ("Don't know how to react to statement " + statement toString() +
-                    " with " + node class name + " on top of the stack.") println()
+                match (node class) {
+                    case List =>
+                        list := node as List<Object>
+                        list add(statement)
+                    case HashMap =>
+                        hm := node as HashMap<String, Object>
+                        match statement {
+                            case v: Var =>
+                                hm put(v name, v)
+                            case =>
+                                ("Don't know how to react to statement " + statement toString() +
+                                    " with a map on top of the stack.") println()
+                        }
+                    case =>
+                        ("Don't know how to react to statement " + statement toString() +
+                            " with " + node class name + " on top of the stack.") println()
+                }
         }
     }
 

@@ -1,3 +1,4 @@
 *_tmp
 .libs
 bin/*
+callgrind.out.*

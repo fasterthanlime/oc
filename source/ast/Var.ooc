@@ -11,6 +11,8 @@ Var: class extends Expression {
 
     init: func (=name) {}
 
+    setType: func (=_type) {}
+
     getType: func -> Type {
         _type
     }
@@ -18,8 +20,6 @@ Var: class extends Expression {
     resolve: func (task: Task) {
         if(!_type) {
             task queue(expr)
-            "expr = %p, class = %s" printfln(expr, expr class name)
-            "and expr = %s" printfln(expr toString())
             _type = expr getType()
             if(!_type)
                 Exception new("Couldn't resolve type of " + toString()) throw()
