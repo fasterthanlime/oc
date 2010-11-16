@@ -70,15 +70,12 @@ Backend: class extends StackBackend {
     }
     
     visitCall: func(c: Call) -> CStatement {
-        "Visiting call %s" printfln(c toString())
         match (c subject) {
             case acc: Access =>
-                "Got call to %s" printfln(acc name)
                 cc := CCall new(acc name) // TODO: args
                 c args each(|x| cc args add(visitExpr(x)))
                 cc
             case =>
-                "Call to whatever" println()
                 Exception new("Unknown call subject type = " + c subject class name) throw(); null
         }
     }
@@ -148,7 +145,6 @@ Backend: class extends StackBackend {
             case b: BaseType =>
                 type(b name)
             case f: FuncType =>
-                "ctype-ing functype %s" printfln(f toString())
                 cf := CFuncType new(ctype(f proto retType))
                 f proto args each(|arg| cf argTypes add(ctype(arg getType())))
                 cf
@@ -165,17 +161,13 @@ Backend: class extends StackBackend {
     visitStat: func (s: Statement) -> CStatement {
         cb := map get(s class)
         if(cb) {
-            cstat := cb f(s)
-            ("Visited stat " + s toString() + " of type " + s class name + ", cb f = %p, cstat address = %p") printfln(cstat, cb f as Closure thunk)
-            (" got cstat " + cstat class name) println()
-            return cstat as CStatement
+            return cb f(s) as CStatement
         } else {
             Exception new("Unknown statement type %s" format(s class name)) throw()
         }
     }
     
     visitExpr: func (e: Expression) -> CExpr {
-        "Visiting expr %s of type %s" printfln(e toString(), e class name)
         cb := map get(e class)
         if(cb) {
             return cb f(e) as CExpr

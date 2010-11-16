@@ -28,8 +28,10 @@ Access: class extends Expression {
             (ref != null) // break if resolved
         )
         
-        if(!ref)
-            Exception new("Undefined symbol `" + name + "`") throw()
+        if(!ref) {
+            "Undefined symbol `%s`" printfln(name)
+            exit(1)
+        }
     }
 
 }
