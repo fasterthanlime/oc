@@ -36,9 +36,10 @@ CSource: class extends CNode {
     init: func (=name) {}
 
     write: func (basePath: String) {
-        baseFile := File new(basePath)
+        baseFile := File new(basePath, name) parent()
         if(!baseFile exists?()) baseFile mkdirs()
-        hw := OcWriter new(FileWriter new(File new(baseFile, name + ".h")))
+        
+        hw := OcWriter new(FileWriter new(File new(basePath, name + ".h")))
 
 	    define := "__" + name map(|c| c alphaNumeric?() ? c toUpper() : '_') + "__define__"
 	    hw nl(). app("#ifndef "). app(define)
@@ -56,7 +57,7 @@ CSource: class extends CNode {
 
         hw close()
         
-        cw := OcWriter new(FileWriter new(File new(baseFile, name + ".c")))
+        cw := OcWriter new(FileWriter new(File new(basePath, name + ".c")))
         cw nl(). app("#include \""). app(name). app(".h\"")
 
         types     each(|t| t write(cw))
