@@ -5,7 +5,7 @@ import middle/Resolver
 
 Type: abstract class extends Node {
 
-    
+    void?: func -> Bool { false }
 
 }
 
@@ -23,6 +23,16 @@ BaseType: class extends Type {
     
     toString: func -> String { name }
 
+}
+
+VoidType: class extends BaseType {
+    
+    init: func {
+        super("void")
+    }
+    
+    void?: func -> Bool { true }
+    
 }
 
 FuncType: class extends Type {

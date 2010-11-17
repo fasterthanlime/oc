@@ -1,7 +1,7 @@
 
 import structs/HashMap
 
-import Expression, Statement, Scope, Var, Type, Access
+import Expression, Statement, Scope, Var, Type, Access, Return
 import middle/Resolver
 
 FuncDecl: class extends Expression {
@@ -10,7 +10,7 @@ FuncDecl: class extends Expression {
     body := Scope new()
     args := HashMap<String, Var> new()
     
-    retType := BaseType new("void")
+    retType := VoidType new()
     _type: FuncType
     
     externName: String { get set }
@@ -28,6 +28,23 @@ FuncDecl: class extends Expression {
         resolved = true // artificial testing
         
         task queue(body)
+        if(!retType void?()) {
+            list := body body
+            if(list empty?()) {
+                "Expected return expression in non-void function %s" printfln(name)
+                exit(1)
+            } else {
+                last := list last()
+                if(last class == Return) {
+                    // all good
+                } else if(last instanceOf?(Expression)) {
+                    list set(list size - 1, Return new(last as Expression))
+                } else {
+                    "Expected return expression in non-void function %s" printfln(name)
+                    exit(1)
+                }
+            }
+        }
     }
     
     resolveAccess: func (acc: Access, task: Task, suggest: Func (Var)) {

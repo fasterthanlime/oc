@@ -1,8 +1,8 @@
 
 printf: extern func
 
-gen: func (i: int) -> Func -> int {
-  func -> int { return i }
+gen: func -> Func -> int {
+  func -> int { 42 }
 }
 
 f1 := gen(42)
