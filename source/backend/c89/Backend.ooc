@@ -115,7 +115,33 @@ Backend: class extends StackBackend {
         cf body addAll(visitScope(fd body))
         pop(CFunction)
         
-        if(!fd externName) source functions add(cf)
+        if(!fd externName) {
+            source functions add(cf)
+            if(fd accesses) {
+                ctx := CStructDecl new(name + "__ctx")
+                
+                shim := CFunction new(cf returnType, name + "_shim")
+                shim args addAll(cf args)
+                ctxVar := var(ctx type pointer(), "__context__")
+                shim args add(ctxVar)
+                
+                call := CCall new(name)
+                
+                fd accesses each(|acc|
+                    v := visitVar(acc ref)
+                    ctx elements add(v)
+                    cf args add(v)
+                    call args add(CAccess new(ctxVar acc() deref(), acc name))
+                )
+                shim body add(call)
+                
+                source types add(ctx)
+                source functions add(shim)
+                
+                // use the shim's name as an access
+                return acc(shim name)
+            }
+        }
         acc(name)
     }
     

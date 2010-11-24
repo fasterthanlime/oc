@@ -47,21 +47,20 @@ CSource: class extends CNode {
 
 	    includes each(|i| hw nl(). app("#include "). app(i))
         
+        types each(|t| t write(hw))
+        
         functions each(|f|
             hw nl()
             f writePrototype(hw)
             hw app(';')
         )
-
-	    hw nl(). app("#endif")
-
-        hw close()
         
         cw := OcWriter new(FileWriter new(File new(basePath, name + ".c")))
         cw nl(). app("#include \""). app(name). app(".h\"")
-
-        types     each(|t| t write(cw))
         functions each(|f| f write(cw))
+        
+        hw nl(). app("#endif")
+        hw close()
         cw close()
     }
 
@@ -124,6 +123,10 @@ CReturn: class extends CStatement {
 
 CExpr: abstract class extends CStatement {
 
+    deref: func -> CExpr {
+        CDeref new(this)
+    }
+
 }
 
 nop := CNop new()
@@ -150,6 +153,10 @@ CVariable: class extends CExpr {
             w app(" = ")
             expr write(w)
         }
+    }
+    
+    acc: func -> CAccess {
+        CAccess new(null, name)
     }
 
 }
@@ -311,7 +318,7 @@ CStructDecl: class extends CTypeDecl {
     type: CType
 
     init: func(=name) {
-	type = CBaseType new("struct " + name)
+        type = CBaseType new("struct " + name)
     }
 
     write: func (w: OcWriter) {

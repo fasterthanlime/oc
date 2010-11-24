@@ -1,7 +1,7 @@
 
 
 import middle/Resolver
-import Expression, Type, Var, Node, Scope, Statement
+import Expression, Type, Var, Node, Scope, Statement, FuncDecl
 
 Access: class extends Expression {
 
@@ -25,7 +25,16 @@ Access: class extends Expression {
             node resolveAccess(this, task, |var|
                 ref = var
             )
-            (ref != null) // break if resolved
+            if(ref != null) return true // break if resolved
+            
+            // if still not resolved and was an anonymous function, mark the access
+            if(node class == FuncDecl) {
+                fd := node as FuncDecl
+                if(fd anon?()) {
+                    fd markAccess(this)
+                }
+            }
+            false
         )
         
         if(!ref) {
