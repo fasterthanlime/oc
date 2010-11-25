@@ -14,17 +14,14 @@ CallBack: class {
     init: func (=f) {}
 }
 
-Backend: class extends StackBackend {
+C89Backend: class extends StackBackend {
 
     module: Module
     source: CSource
     
     map := HashMap<Class, CallBack> new()
 
-    init: func (=module) {
-        source = CSource new(module fullName)
-    	push(source)
-        
+    init: func {
         put(Call,  |c| visitCall(c as Call))
         put(Var,   |v| visitVar(v as Var))
         put(Access,|a| visitAccess(a as Access))
@@ -32,8 +29,14 @@ Backend: class extends StackBackend {
         put(FuncDecl, |fd| visitFuncDecl(fd as FuncDecl))
         put(StringLit, |sl| visitStringLit(sl as StringLit))
         put(NumberLit, |sl| visitNumberLit(sl as NumberLit))
-        
-    	visitModule(module)
+    }
+
+    process: func (=module) {
+        source = CSource new(module fullName)
+        stack clear()
+    	push(source)
+        visitModule(module)
+        peek(CSource) write("oc_tmp")
     }
     
     visitModule: func (m: Module) {
@@ -211,11 +214,4 @@ Backend: class extends StackBackend {
         }
     }
 
-    generate: func {
-        peek(CSource) write("oc_tmp")
-    }
-
 }
-
-
-

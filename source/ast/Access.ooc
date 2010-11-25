@@ -21,6 +21,8 @@ Access: class extends Expression {
     }
 
     resolve: func (task: Task) {
+        marker : FuncDecl = null
+        
         task walkBackward(|node|
             node resolveAccess(this, task, |var|
                 ref = var
@@ -28,11 +30,9 @@ Access: class extends Expression {
             if(ref != null) return true // break if resolved
             
             // if still not resolved and was an anonymous function, mark the access
-            if(node class == FuncDecl) {
+            if(!marker && node class == FuncDecl) {
                 fd := node as FuncDecl
-                if(fd anon?()) {
-                    fd markAccess(this)
-                }
+                if(fd anon?()) marker = fd
             }
             false
         )
@@ -41,6 +41,8 @@ Access: class extends Expression {
             "Undefined symbol `%s`" printfln(name)
             exit(1)
         }
+        
+        if(marker && !ref global) marker markAccess(this)
     }
 
 }

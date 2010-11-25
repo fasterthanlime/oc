@@ -83,6 +83,14 @@ AstBuilder: class extends OocListener {
         // FIXME: and what about caching? huh?
         pool push(ParsingJob new(realPath, _import))
     }
+    
+    /*
+     * 
+     */
+    onInclude: func (name: CString) {
+        peek(Module) includes add(name toString())
+    }
+
 
     /*
      * Functions
@@ -243,6 +251,12 @@ AstBuilder: class extends OocListener {
             case mod: Module =>
                 //"Got statement %s in module body" printfln(statement toString())
                 mod body add(statement)
+                match statement {
+                    case fd: FuncDecl =>
+                        fd global = true
+                    case vd: Var =>
+                        vd global = true
+                }
             case =>
                 match (node class) {
                     case List =>
@@ -265,4 +279,3 @@ AstBuilder: class extends OocListener {
     }
 
 }
-

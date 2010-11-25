@@ -2,8 +2,11 @@
 import os/Coro, structs/[ArrayList, List, Stack, HashBag]
 
 import ast/[Node, Module]
+import ../backend/Backend
 
 Task: class {
+    resolver: Resolver
+    
     id: Int { get set }
     idSeed := static 0
 
@@ -20,10 +23,10 @@ Task: class {
     lastFree := static Stack<This> new()
 
     init: func ~real (=parent, .node, dummy: Bool) {
-        init(parent coro, node)
+        init(parent resolver, parent coro, node)
     }
 
-    init: func ~onlyCoro (=parentCoro, =node) {
+    init: func ~onlyCoro (=resolver, =parentCoro, =node) {
         idSeed += 1
         id = idSeed
         coro = Coro new()
@@ -173,12 +176,26 @@ Task: class {
     }
 }
 
+ModuleTask: class extends Node {
+    module: Module
+    
+    init: func (=module) {}
+    
+    resolve: func (task: Task) {
+        task queue(module)
+        "Finished resolving %s!" printfln(module fullName)
+        task resolver backend process(module)
+    }
+}
+
 Resolver: class extends Node {
 
     modules: ArrayList<Module> { get set }
+    backend: Backend
 
-    init: func {
+    init: func (=backend, mainModule: Module) {
         modules = ArrayList<Module> new()
+        modules addAll(mainModule getDeps())
     }
 
     start: func {
@@ -187,7 +204,7 @@ Resolver: class extends Node {
         mainCoro := Coro new()
         mainCoro initializeMainCoro()
 
-        mainTask := Task new(mainCoro, this)
+        mainTask := Task new(this, mainCoro, this)
         mainTask start()
         while(!mainTask done?) {
             "" println()
@@ -199,8 +216,7 @@ Resolver: class extends Node {
     }
 
     resolve: func (task: Task) {
-        task queueList(modules)
+        task queueList(modules map(|m| ModuleTask new(m)))
     }
 
 }
-

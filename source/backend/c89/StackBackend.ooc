@@ -1,7 +1,7 @@
 
-import structs/Stack, C89Ast
+import structs/Stack, ../Backend, C89Ast
 
-StackBackend: class {
+StackBackend: abstract class extends Backend {
 
     stack := Stack<CNode> new()
 

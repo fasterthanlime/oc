@@ -5,6 +5,8 @@ import Type, Expression
 
 Var: class extends Expression {
 
+    global := false
+
     _type: Type
     name: String { get set }
     expr: Expression { get set }
@@ -33,4 +35,3 @@ Var: class extends Expression {
     }
 
 }
-

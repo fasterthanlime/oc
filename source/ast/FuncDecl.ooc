@@ -6,6 +6,8 @@ import middle/Resolver
 
 FuncDecl: class extends Expression {
 
+    global := false
+
     resolved := false
     body := Scope new()
     args := HashMap<String, Var> new()

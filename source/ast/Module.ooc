@@ -22,6 +22,7 @@ Module: class extends Node {
     body := Scope new()
 
     imports := ArrayList<Import> new()
+    includes := ArrayList<String> new()
 
     main? : Bool { get set }
     
@@ -58,4 +59,3 @@ Module: class extends Node {
     }
 
 }
-
