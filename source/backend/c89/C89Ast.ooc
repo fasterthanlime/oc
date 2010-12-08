@@ -44,6 +44,8 @@ CSource: class extends CNode {
 	    define := "__" + name map(|c| c alphaNumeric?() ? c toUpper() : '_') + "__define__"
 	    hw nl(). app("#ifndef "). app(define)
 	    hw nl(). app("#define "). app(define)
+        
+        writeClosureType(hw)
 
 	    includes each(|i| hw nl(). app("#include "). app(i))
         
@@ -59,8 +61,6 @@ CSource: class extends CNode {
         cw nl(). app("#include \""). app(name). app(".h\"")
         cw nl(). app("#include <stdlib.h>")
         
-        writeClosureType(cw)
-        
         functions each(|f| f write(cw))
         
         hw nl(). app("#endif")
@@ -68,8 +68,8 @@ CSource: class extends CNode {
         cw close()
     }
     
-    writeClosureType: func (cw: OcWriter) {
-        cw app("
+    writeClosureType: func (w: OcWriter) {
+        w app("
 struct Closure {
     int (*thunk)();
     void *context;

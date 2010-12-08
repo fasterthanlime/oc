@@ -18,6 +18,7 @@ C89Backend: class extends StackBackend {
 
     module: Module
     source: CSource
+    loadFunc: CFunction
     
     map := HashMap<Class, CallBack> new()
 
@@ -26,7 +27,7 @@ C89Backend: class extends StackBackend {
         put(Var,   |v| visitVar(v as Var))
         put(Access,|a| visitAccess(a as Access))
         put(Return,|r| visitReturn(r as Return))
-        put(FuncDecl, |fd| visitFuncDecl(fd as FuncDecl))
+        put(FuncDecl,  |fd| visitFuncDecl(fd as FuncDecl))
         put(StringLit, |sl| visitStringLit(sl as StringLit))
         put(NumberLit, |sl| visitNumberLit(sl as NumberLit))
     }
@@ -41,13 +42,15 @@ C89Backend: class extends StackBackend {
     
     visitModule: func (m: Module) {
         ("Visiting module " + m fullName) println()
-        loadFunc := CFunction new(type("void"), "__" + m fullName map(|c| c alphaNumeric?() ? c : '_') + "__")
+        loadFunc = CFunction new(type("void"), "__" + m fullName map(|c| c alphaNumeric?() ? c : '_') + "__")
         source functions add(loadFunc)
         
+        push(loadFunc)
         visitScope(m body) each(|stat|
             if(stat class == CVariable && stat as CVariable shallow?) return
             loadFunc body add(stat)
         )
+        pop(CFunction)
         
         if(m main?) {
             main : CFunction = null
@@ -75,10 +78,15 @@ C89Backend: class extends StackBackend {
     visitCall: func(c: Call) -> CStatement {
         match (c subject) {
             case acc: Access =>
-                cc := CCall new(acc name) // TODO: args
+                cc := CCall new(acc name)
                 v := acc ref
-                "Calling %s, acc ref is %s of type %s" printfln(acc name, v expr toString(), v expr class name)
-                if(v expr class != FuncDecl) {
+                
+                if(v expr) {
+                    "Calling %s, acc ref is %s of type %s" printfln(acc name, v expr toString(), v expr class name)
+                } else {
+                    "Calling %s, acc ref is %s, no expr" printfln(acc name, acc ref toString())
+                }
+                if(!v expr || v expr class != FuncDecl) {
                     cc fat = true
                 }
                 c args each(|x| cc args add(visitExpr(x)))
@@ -136,6 +144,10 @@ C89Backend: class extends StackBackend {
         
         // TODO: find a way to add fatVar to the body :x
         outer := find(CFunction)
+        if(!outer) {
+            "No outer context for closure with name %s" printfln(name)
+            exit(1)
+        }
         
         if(fd accesses) {
             ctx := CStructDecl new(name + "__ctx")
@@ -149,9 +161,6 @@ C89Backend: class extends StackBackend {
                 outer body add(acc("/* Yay memory leaks! */"))
                 outer body add(assign(ctxVar, call("malloc", call("sizeof", acc("struct " + ctx name)))))
                 outer body add(assign(acc(ctxVar name) deref(), ctxLiteral))
-            } else {
-                "No outer context for closure with name %s" printfln(name)
-                exit(1)
             }
             shim args add(ctxVar)
             
@@ -177,7 +186,7 @@ C89Backend: class extends StackBackend {
             fatPointer elements add(acc("NULL"))
         }
         
-        if(outer) {
+        if(outer && (anon || fd accesses)) {
             outer body add(fatVar)
         }
         acc(fatVar name)
