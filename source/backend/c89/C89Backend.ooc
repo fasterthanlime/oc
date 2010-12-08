@@ -76,6 +76,11 @@ C89Backend: class extends StackBackend {
         match (c subject) {
             case acc: Access =>
                 cc := CCall new(acc name) // TODO: args
+                v := acc ref
+                "Calling %s, acc ref is %s of type %s" printfln(acc name, v expr toString(), v expr class name)
+                if(v expr class != FuncDecl) {
+                    cc fat = true
+                }
                 c args each(|x| cc args add(visitExpr(x)))
                 cc
             case =>
@@ -97,6 +102,7 @@ C89Backend: class extends StackBackend {
     
     visitFuncDecl: func (fd: FuncDecl) -> CAccess {
         name := fd name
+        anon := false
         if(name empty?()) {
             match (stack peek()) {
                 case v: CVariable =>
@@ -105,13 +111,14 @@ C89Backend: class extends StackBackend {
                 case =>
                     // just generate a garbage name
                     name = stack peek() genName("anonfunc")
+                    anon = true
             }
         }
         
-        visitFuncDeclWithName(fd, name)
+        visitFuncDeclWithName(fd, name, anon)
     }
     
-    visitFuncDeclWithName: func (fd: FuncDecl, name: String) -> CAccess {
+    visitFuncDeclWithName: func (fd: FuncDecl, name: String, anon: Bool) -> CAccess {
         cf := CFunction new(ctype(fd retType), name)
         push(cf)
         fd args each(|arg| cf args add(visitVar(arg)))
@@ -120,32 +127,60 @@ C89Backend: class extends StackBackend {
         
         if(!fd externName) {
             source functions add(cf)
-            if(fd accesses) {
-                ctx := CStructDecl new(name + "__ctx")
-                
-                shim := CFunction new(cf returnType, name + "_shim")
-                shim args addAll(cf args)
-                ctxVar := var(ctx type pointer(), "__context__")
-                shim args add(ctxVar)
-                
-                call := CCall new(name)
-                
-                fd accesses each(|acc|
-                    v := visitVar(acc ref)
-                    ctx elements add(v)
-                    cf args add(v)
-                    call args add(CAccess new(ctxVar acc() deref(), acc name))
-                )
-                shim body add(call)
-                
-                source types add(ctx)
-                source functions add(shim)
-                
-                // use the shim's name as an access
-                return acc(shim name)
-            }
         }
-        acc(name)
+            
+        // create the fat version of the func pointer
+        fatPointer := CStructLiteral new(type("struct Closure"))
+        fatVar := var(fatPointer type, name + "_fatPtr")
+        fatVar expr = fatPointer
+        
+        // TODO: find a way to add fatVar to the body :x
+        outer := find(CFunction)
+        
+        if(fd accesses) {
+            ctx := CStructDecl new(name + "__ctx")
+            
+            shim := CFunction new(cf returnType, name + "_shim")
+            shim args addAll(cf args)
+            ctxVar := var(ctx type pointer(), name + "__context__")
+            ctxLiteral := CStructLiteral new(ctx type)
+            
+            if(outer) {
+                outer body add(acc("/* Yay memory leaks! */"))
+                outer body add(assign(ctxVar, call("malloc", call("sizeof", acc("struct " + ctx name)))))
+                outer body add(assign(acc(ctxVar name) deref(), ctxLiteral))
+            } else {
+                "No outer context for closure with name %s" printfln(name)
+                exit(1)
+            }
+            shim args add(ctxVar)
+            
+            call := CCall new(name)
+            
+            fd accesses each(|acc|
+                v := visitVar(acc ref)
+                ctx elements add(v)
+                ctxLiteral elements add(CAccess new(null, acc name))
+                cf args add(v)
+                call args add(CAccess new(ctxVar acc() deref(), acc name))
+            )
+            shim body add(call)
+            
+            source types add(ctx)
+            source functions add(shim)
+            
+            fatPointer elements add(acc(shim name))
+            fatPointer elements add(acc(ctxVar name))
+            
+        } else {
+            fatPointer elements add(acc(name))
+            fatPointer elements add(acc("NULL"))
+        }
+        
+        if(outer) {
+            outer body add(fatVar)
+        }
+        acc(fatVar name)
     }
     
     visitAccess: func (a: Access) -> CAccess {

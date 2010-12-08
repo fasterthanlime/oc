@@ -9,7 +9,7 @@ main: func (args: ArrayList<String>) {
 
     opts := Opts new(args)
 
-    if(opts args size <= 1) {
+    if(opts args empty?()) {
         "Usage: oc file.ooc" println()
         exit(1)
     }

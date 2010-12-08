@@ -24,5 +24,17 @@ StackBackend: abstract class extends Backend {
     	}
     	o
     }
+    
+    find: func <T> (T: Class) -> T {
+        i := stack data size - 1
+        while(i >= 0) {
+            node := stack data get(i) as CNode
+            if(node instanceOf?(T)) {
+                return node
+            }
+            i -= 1
+        }
+        null
+    }
 
 }

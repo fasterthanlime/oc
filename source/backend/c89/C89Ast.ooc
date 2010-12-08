@@ -57,11 +57,24 @@ CSource: class extends CNode {
         
         cw := OcWriter new(FileWriter new(File new(basePath, name + ".c")))
         cw nl(). app("#include \""). app(name). app(".h\"")
+        cw nl(). app("#include <stdlib.h>")
+        
+        writeClosureType(cw)
+        
         functions each(|f| f write(cw))
         
         hw nl(). app("#endif")
         hw close()
         cw close()
+    }
+    
+    writeClosureType: func (cw: OcWriter) {
+        cw app("
+struct Closure {
+    int (*thunk)();
+    void *context;
+};
+")
     }
 
 }
@@ -125,6 +138,10 @@ CExpr: abstract class extends CStatement {
 
     deref: func -> CExpr {
         CDeref new(this)
+    }
+    
+    addrOf: func -> CExpr {
+        CAddressOf new(this)
     }
 
 }
@@ -262,12 +279,21 @@ CCall: class extends CExpr {
     
     name: String
     args := ArrayList<CExpr> new()
+    fat := false
     
     init: func(=name) {}
     
     write: func (w: OcWriter) {
-        w app(name)
-        w writeEach(args, "(", ", ", ")", |arg| arg write(w))
+        if(fat) {
+            w app(name). app(".thunk("). app(name). app(".context")
+            if(args empty?())
+                w app(")")
+            else
+                w writeEach(args, ", ", ", ", ")", |arg| arg write(w))
+        } else {
+            w app(name)
+            w writeEach(args, "(", ", ", ")", |arg| arg write(w))
+        }
     }
     
 }
@@ -331,6 +357,22 @@ CStructDecl: class extends CTypeDecl {
 
 }
 
+CStructLiteral: class extends CExpr {
+    
+    type: CType
+    elements := ArrayList<CExpr> new()
+    
+    init: func(=type) {}
+    
+    write: func (w: OcWriter) {
+        w app("(")
+        type write(w)
+        w app(") ")
+        w writeEach(elements, "{", ", ", "}", |expr| expr write(w))
+    }
+    
+}
+
 CType: abstract class extends CExpr {
     
     write: abstract func ~withAnon (w: OcWriter, writeMid: Func (OcWriter))
@@ -364,17 +406,24 @@ CBaseType: class extends CType {
 
 CFuncType: class extends CType {
     
+    fat := true
+    
     argTypes := ArrayList<CType> new()
     retType: CType
     
     init: func (=retType) {}
     
     write: func ~withAnon (w: OcWriter, writeMid: Func (OcWriter)) {
-        retType write(w)
-        w app(" (*")
-        writeMid(w)
-        w app(")")
-        w writeEach(argTypes, "(", ", ", ")", |argType| argType write(w))
+        if(fat) {
+            w app("struct Closure")
+            writeMid(w)
+        } else {
+            retType write(w)
+            w app(" (*")
+            writeMid(w)
+            w app(")")
+            w writeEach(argTypes, "(", ", ", ")", |argType| argType write(w))
+        }
     }
     
 }
@@ -391,5 +440,3 @@ CPointerType: class extends CType {
     }
 
 }
-
-
