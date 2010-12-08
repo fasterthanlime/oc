@@ -1,13 +1,13 @@
 
 printf: extern func
 
-while: func (cond: Func -> Bool, block: Func) {
-    if(cond(), ||
+while0: func (cond: Func -> Bool, block: Func) {
+    cond() ifTrue(||
         block()
         while0(cond, block)
     )
 }
 
-while(|| true, ||
-    printf("%s\n", Hi there!)
+while0(|| 1, ||
+    printf("%s\n", "Hi there!")
 )

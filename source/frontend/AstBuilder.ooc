@@ -151,6 +151,10 @@ AstBuilder: class extends OocListener {
     onFunctionCallArg: func (arg: Expression) {
         peek(Call) args add(arg)
     }
+    
+    onFunctionCallExpr: func (call: Call, expr: Expression) {
+        call subject = Access new(expr, call subject name)
+    }
 
     onFunctionCallEnd: func -> Call {
         pop(Call)

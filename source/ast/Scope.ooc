@@ -18,7 +18,7 @@ Scope: class extends Node {
 
     resolveAccess: func (acc: Access, task: Task, suggest: Func (Var)) {
         idx : Int = -1
-        //"Looking for %s in %s" printfln(acc toString(), toString())
+        "Looking for %s in %s" printfln(acc toString(), toString())
 
         if(task has("noindex")) {
             size := body size
@@ -36,7 +36,8 @@ Scope: class extends Node {
             if(idx == -1) return // not found, don't resolve
         }
         
-        for(i in 0..idx) {
+        // idx + 1 to allow recursion, of course :)
+        for(i in 0..(idx + 1)) {
             node := body[i]
             match (node class) {
                 case Var =>
@@ -54,4 +55,3 @@ Scope: class extends Node {
     }
 
 }
-

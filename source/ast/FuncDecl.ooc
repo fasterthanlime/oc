@@ -42,6 +42,7 @@ FuncDecl: class extends Expression {
         task queue(retType)
         resolved = true // artificial testing
         
+        "Resolving body of %s" printfln(toString())
         task queue(body)
         autoReturn(task)
     }
@@ -67,6 +68,7 @@ FuncDecl: class extends Expression {
     }
     
     resolveAccess: func (acc: Access, task: Task, suggest: Func (Var)) {
+        "Resolving access %s in %s" printfln(acc toString(), toString())
         v := args get(acc name)
         if(v) suggest(v)
     }

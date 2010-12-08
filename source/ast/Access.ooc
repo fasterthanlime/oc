@@ -24,12 +24,13 @@ Access: class extends Expression {
         marker : FuncDecl = null
         
         task walkBackward(|node|
+            //"Resolving access %s, in node %s" printfln(toString(), node toString())
             node resolveAccess(this, task, |var|
                 ref = var
             )
             if(ref != null) return true // break if resolved
             
-            // if still not resolved and was an anonymous function, mark the access
+            // if still not resolved and was a function, mark the access
             if(!marker && node class == FuncDecl) {
                 fd := node as FuncDecl
                 if(fd anon?()) marker = fd
