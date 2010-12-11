@@ -2,6 +2,7 @@
 .libs
 bin/*
 build/*
+plugins/*
 core
 callgrind.out.*
 a.out

@@ -18,7 +18,7 @@ Scope: class extends Node {
 
     resolveAccess: func (acc: Access, task: Task, suggest: Func (Var)) {
         idx : Int = -1
-        "Looking for %s in %s" printfln(acc toString(), toString())
+        //"Looking for %s in %s" printfln(acc toString(), toString())
 
         if(task has("noindex")) {
             size := body size

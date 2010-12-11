@@ -8,27 +8,27 @@ main: func (args: ArrayList<String>) {
 
     opts := Opts new(args)
 
+    params := BuildParams new(opts opts)
     if(opts args empty?()) {
         "Usage: oc file.ooc" println()
         exit(1)
     }
     
     opts args each(|arg|
-        compile(arg, opts)
+        compile(arg, params)
     )
     
 }
 
-compile: func (file: String, opts: Opts) {
+compile: func (file: String, params: BuildParams) {
 
-    params := BuildParams new(opts opts)
-
+    // parse main module and dependencies!
     pool := ParsingPool new()
     mainJob := ParsingJob new(file, null)
     pool push(mainJob)
     pool exhaust()
+    
     mainJob module main? = true
-
     Resolver new(params, mainJob module) start()
     
 }

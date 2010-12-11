@@ -1,0 +1,4 @@
+Name: libdl
+Description: Dynamic Loading library
+Libs: -ldl
+Includes: dlfcn.h

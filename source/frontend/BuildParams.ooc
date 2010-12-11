@@ -28,6 +28,7 @@ BuildParams: class {
                 verbose += 1
             case "V" =>
                 "oc v%s - huhu" printfln(VERSION)
+                exit(0)
             case "self" =>
                 self = val
             case =>
@@ -38,6 +39,10 @@ BuildParams: class {
         if(!backend) {
             if(verbose > 0) "No backend selected, using C89 backend" println()
             backend = BackendFactory make("c89")
+            if(!backend) {
+                "Couldn't load c89 backend, bailing out!" println()
+                exit(1)
+            }
         }
         if(verbose > 0) {
             "oc v%s  sourcepath = %s  outpath = %s  backend is %s" printfln(VERSION, sourcepath join(":"), outpath, backend class name)

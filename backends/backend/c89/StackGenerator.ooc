@@ -1,5 +1,5 @@
 
-import structs/Stack, C89Ast
+import structs/Stack, Ast
 
 StackGenerator: abstract class {
 

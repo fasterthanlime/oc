@@ -7,7 +7,7 @@ import structs/[HashMap, ArrayList, List]
 import io/[File, FileWriter]
 
 import frontend/BuildParams
-import C89Ast, StackGenerator, ../Backend
+import Ast, StackGenerator, ../Backend
 
 CallBack: class {
     f: Func (Node) -> Object
@@ -15,7 +15,7 @@ CallBack: class {
     init: func (=f) {}
 }
 
-C89Backend: class extends Backend {
+c89_Backend: class extends Backend {
     
     process: func (module: Module, params: BuildParams) {
         C89Generator new(module, params)
