@@ -1,11 +1,3 @@
-#!/bin/bash
-mkdir -p bin .libs
-if [[ ! -e .libs/NagaQueen.o ]]; then
-  echo "Re-generating naga"
-  greg ../nagaqueen/grammar/nagaqueen.leg > .libs/NagaQueen.c || exit
-  gcc -c -std=c99 -D__OOC_USE_GC__ .libs/NagaQueen.c -O3 -o .libs/NagaQueen.o $C_FLAGS
-fi
-echo "Compiling oc"
-#OOC_LIBS=.. OOC_DIST=/blue/Dev/rock gdb --args rock -allerrors -g -v -sourcepath=source main .libs/NagaQueen.o -o=bin/oc $OOC_FLAGS
-OOC_LIBS=.. rock -g +-rdynamic -allerrors -v -debuglibcache -sourcepath=source main .libs/NagaQueen.o -o=bin/oc $OOC_FLAGS
-#OOC_LIBS=.. rock -noclean -nolines +-O3 -allerrors -v -debuglibcache -sourcepath=source main .libs/NagaQueen.o -o=bin/oc $OOC_FLAGS
+#!/bin/sh
+
+make-oc && make-c89

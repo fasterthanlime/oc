@@ -1,28 +1,32 @@
 import Backend
+import frontend/BuildParams
 import io/File
 
 BackendFactory: class {
     
     previousHandle: static LibHandle = null
     
-    make: static func (name: String) -> Backend {
+    make: static func (name: String, params: BuildParams) -> Backend {
         if(previousHandle) {
-            "Closing previous handle"
+            "Closing previous handle" println()
             dlclose(previousHandle)
         }
         
         prefix := name + "_backend"
         
-        // TODO ohum: plugins is not necessarily in "./"
-        plugins := File new("plugins")
+        plugins := File new(params home, "plugins")
+        if(!plugins exists?()) {
+            "Couldn't locate oc plugins in %s - please set the OC_DIST environment variable" printfln(plugins path)
+            exit(1)
+        }
         
         path := ""
         plugins getChildren() each(|child|
             if(child name() startsWith?(prefix)) {
-                "Found backend %s in %s" printfln(child path, name)
+                if(params verbose > 0) "Found backend %s in %s" printfln(child path, name)
                 path = child path
             } else {
-                "Ignoring %s" printfln(child path)
+                if(params verbose > 0) "Ignoring %s" printfln(child path)
             }
         )
         
@@ -37,10 +41,10 @@ BackendFactory: class {
             // that's the constructor we're looking for!
             symbolName := "backend_%s_Backend__%s_Backend_new" format(name, name)
             
-            "Looking for symbol %s" printfln(symbolName)
+            //"Looking for symbol %s" printfln(symbolName)
             constructor := dlsym(handle, symbolName)
             
-            "Got address %p" printfln(constructor)
+            //"Got address %p" printfln(constructor)
             if(!constructor) {
                 "Symbol '%s' not found in backend %s" printfln(symbolName, path)
                 dlclose(handle)
@@ -54,7 +58,7 @@ BackendFactory: class {
             if(!backend) {
                 "Couldn't instantiate backend for '%s', please report this bug to backend maintainers" printfln(name)
             }
-            "Got backend %s" printfln(backend class name)
+            if(params verbose > 0) "Got backend %s" printfln(backend class name)
             return backend
         }
         null

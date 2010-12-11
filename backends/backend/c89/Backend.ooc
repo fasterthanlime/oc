@@ -46,6 +46,7 @@ C89Generator: class extends StackGenerator {
         source = CSource new(module fullName)
         push(source)
         visitModule(module)
+        "Compiling %s, outpath = %s" printfln(module fullName, params outpath)
         peek(CSource) write(params outpath)
     }
     

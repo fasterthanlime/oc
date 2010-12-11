@@ -1,0 +1,3 @@
+#!/bin/sh
+
+OOC_LIBS=. rock -v -dynamiclib=plugins/c89_backend.so -sourcepath=backends:source backend/c89/Backend 

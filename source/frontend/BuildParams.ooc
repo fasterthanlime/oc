@@ -1,4 +1,5 @@
 
+import io/File, os/Env, text/StringTokenizer
 import structs/[ArrayList, HashMap]
 
 import backend/[Backend, BackendFactory]
@@ -8,6 +9,7 @@ BuildParams: class {
     VERSION := static "0.0"
     
     self := ""
+    home := "."
     verbose := 0
     leftOver: HashMap<String, String>
     
@@ -17,13 +19,16 @@ BuildParams: class {
     backend: Backend = null
     
     init: func (map: HashMap<String, String>) {
+        
+        backendString := ""
+        
         map each(|key, val| match key {
             case "sourcepath" =>
                 sourcepath = val
             case "outpath" =>
                 outpath = val
             case "backend" =>
-                backend = BackendFactory make(val)
+                backendString = val
             case "v" || "verbose" =>
                 verbose += 1
             case "V" =>
@@ -36,17 +41,53 @@ BuildParams: class {
                 leftOver put(key, val)
         })
         
-        if(!backend) {
+        locateHome()
+        
+        if(backendString == "") {
             if(verbose > 0) "No backend selected, using C89 backend" println()
-            backend = BackendFactory make("c89")
-            if(!backend) {
-                "Couldn't load c89 backend, bailing out!" println()
-                exit(1)
-            }
+            backendString = "c89"
         }
+        
+        backend = BackendFactory make("c89", this)
+        if(!backend) {
+            "Couldn't load c89 backend, bailing out!" println()
+            exit(1)
+        }
+        
         if(verbose > 0) {
             "oc v%s  sourcepath = %s  outpath = %s  backend is %s" printfln(VERSION, sourcepath join(":"), outpath, backend class name)
             "-----------------------------------------------------------------------"
+        }
+    }
+    
+    locateHome: func {
+        if(verbose > 0) "Should locate position of oc. Self = %s" printfln(self)
+        selfFile := File new(self)
+        
+        if(selfFile exists?()) {
+            // okay so we have a direct path to the exec - let's back out of bin/
+            guess1 := selfFile getAbsoluteFile() parent() parent()
+            if(verbose > 0) "Guess from direct path is %s" printfln(guess1 path)
+            home = guess1 path
+            return
+        }
+        
+        // hmm let's search the path then
+        path := Env get("PATH")
+        if(path) {
+            path split(File pathDelimiter) each(|folder|
+                if(verbose > 0) "Looking in %s" printfln(folder)
+                // whoever thought of adding '.exe' to executable files wasn't in his right mind -.-
+                f := File new(folder, self)
+                if(!f exists?()) {
+                    f = File new(folder, self + ".exe")
+                    if(!f exists?()) return
+                }
+                
+                guess2 := f getAbsoluteFile() parent() parent()
+                if(verbose > 0) "Guess from binary path is %s" printfln(guess2 path)
+                home = guess2 path
+            )
         }
     }
     

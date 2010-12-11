@@ -1,0 +1,3 @@
+
+"Maybe programming languages should restrict the length of methods/functions." @Gilad_Bracha
+"Or compilers warn on complexity" @vborja
