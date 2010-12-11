@@ -48,9 +48,9 @@ BuildParams: class {
             backendString = "c89"
         }
         
-        backend = BackendFactory make("c89", this)
+        backend = BackendFactory make(backendString, this)
         if(!backend) {
-            "Couldn't load c89 backend, bailing out!" println()
+            "Couldn't load backend '%s', bailing out!" printfln(backendString)
             exit(1)
         }
         

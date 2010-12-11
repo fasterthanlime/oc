@@ -2,6 +2,7 @@
 import structs/ArrayList
 import frontend/[ParsingPool, BuildParams]
 import middle/Resolver
+import backend/BackendFactory
 import text/Opts
 
 main: func (args: ArrayList<String>) {
@@ -30,5 +31,7 @@ compile: func (file: String, params: BuildParams) {
     
     mainJob module main? = true
     Resolver new(params, mainJob module) start()
+    
+    BackendFactory cleanup() // this isn't one of the bestest place to do that.
     
 }

@@ -1,3 +1,3 @@
 #!/bin/sh
 
-make-oc && make-c89
+./make-oc && ./make-c89

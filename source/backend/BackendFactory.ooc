@@ -6,11 +6,19 @@ BackendFactory: class {
     
     previousHandle: static LibHandle = null
     
-    make: static func (name: String, params: BuildParams) -> Backend {
+    cleanup: static func {
         if(previousHandle) {
-            "Closing previous handle" println()
-            dlclose(previousHandle)
+            "Closing previous handle %p" printfln(previousHandle)
+            if(dlclose(previousHandle) != 0) {
+                "Error while closing handle: %s" printfln(dlerror())
+            }
+            previousHandle = null
+            "Closed" println()
         }
+    }
+    
+    make: static func (name: String, params: BuildParams) -> Backend {
+        cleanup()
         
         prefix := name + "_backend"
         
@@ -59,6 +67,7 @@ BackendFactory: class {
                 "Couldn't instantiate backend for '%s', please report this bug to backend maintainers" printfln(name)
             }
             if(params verbose > 0) "Got backend %s" printfln(backend class name)
+            previousHandle = handle
             return backend
         }
         null
