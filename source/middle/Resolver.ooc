@@ -3,6 +3,7 @@ import os/Coro, structs/[ArrayList, List, Stack, HashBag]
 
 import ast/[Node, Module]
 import ../backend/Backend
+import ../frontend/BuildParams
 
 Task: class {
     resolver: Resolver
@@ -184,16 +185,16 @@ ModuleTask: class extends Node {
     resolve: func (task: Task) {
         task queue(module)
         "Finished resolving %s!" printfln(module fullName)
-        task resolver backend process(module)
+        task resolver params backend process(module, task resolver params)
     }
 }
 
 Resolver: class extends Node {
 
     modules: ArrayList<Module> { get set }
-    backend: Backend
+    params: BuildParams
 
-    init: func (=backend, mainModule: Module) {
+    init: func (=params, mainModule: Module) {
         modules = ArrayList<Module> new()
         modules addAll(mainModule getDeps())
     }

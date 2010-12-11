@@ -1,11 +1,18 @@
 
-import nagaqueen/OocListener // for IntFormat
 import Expression, Type
 import middle/Resolver
 
+/** Different number formats - in sync with nagaqueen's "IntFormat" */
+NumberFormat: enum {
+    bin = 2
+    oct = 8
+    dec = 10
+    hex = 16
+}
+
 NumberLit: class extends Expression {
 
-    format: IntFormat
+    format: NumberFormat
     value: String
     type := static BaseType new("int") // well, maybe
 

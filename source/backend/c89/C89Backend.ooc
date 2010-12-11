@@ -1,12 +1,13 @@
 
 import ast/[Module, Node, FuncDecl, Access, Var, Scope, Type,
     Call, StringLit, NumberLit, Statement, Expression, Return]
-import text/EscapeSequence
+import text/[Opts, EscapeSequence]
 
 import structs/[HashMap, ArrayList, List]
 import io/[File, FileWriter]
 
-import C89Ast, StackBackend
+import frontend/BuildParams
+import C89Ast, StackGenerator, ../Backend
 
 CallBack: class {
     f: Func (Node) -> Object
@@ -14,15 +15,25 @@ CallBack: class {
     init: func (=f) {}
 }
 
-C89Backend: class extends StackBackend {
+C89Backend: class extends Backend {
+    
+    process: func (module: Module, params: BuildParams) {
+        C89Generator new(module, params)
+    }
+    
+}
+
+C89Generator: class extends StackGenerator {
 
     module: Module
     source: CSource
     loadFunc: CFunction
+    params: BuildParams
     
     map := HashMap<Class, CallBack> new()
 
-    init: func {
+    init: func(=module, =params) {
+        // setup hooks
         put(Call,  |c| visitCall(c as Call))
         put(Var,   |v| visitVar(v as Var))
         put(Access,|a| visitAccess(a as Access))
@@ -30,14 +41,12 @@ C89Backend: class extends StackBackend {
         put(FuncDecl,  |fd| visitFuncDecl(fd as FuncDecl))
         put(StringLit, |sl| visitStringLit(sl as StringLit))
         put(NumberLit, |sl| visitNumberLit(sl as NumberLit))
-    }
-
-    process: func (=module) {
+    
+        // initialize the source and the stack
         source = CSource new(module fullName)
-        stack clear()
-    	push(source)
+        push(source)
         visitModule(module)
-        peek(CSource) write("oc_tmp")
+        peek(CSource) write(params outpath)
     }
     
     visitModule: func (m: Module) {

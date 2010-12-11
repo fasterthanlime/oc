@@ -223,7 +223,7 @@ AstBuilder: class extends OocListener {
     }
     
     onIntLiteral: func (format: IntFormat, value: CString) -> NumberLit {
-        NumberLit new(format, value toString())
+        NumberLit new(format as NumberFormat, value toString())
     }
     
     onReturn: func (expr: Expression) -> Statement {

@@ -1,6 +1,7 @@
 *_tmp
 .libs
 bin/*
+build/*
 core
 callgrind.out.*
 a.out

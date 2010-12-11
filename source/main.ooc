@@ -1,8 +1,7 @@
 
 import structs/ArrayList
-import frontend/ParsingPool
+import frontend/[ParsingPool, BuildParams]
 import middle/Resolver
-import backend/c89/C89Backend
 import text/Opts
 
 main: func (args: ArrayList<String>) {
@@ -21,13 +20,15 @@ main: func (args: ArrayList<String>) {
 }
 
 compile: func (file: String, opts: Opts) {
-    
+
+    params := BuildParams new(opts opts)
+
     pool := ParsingPool new()
     mainJob := ParsingJob new(file, null)
     pool push(mainJob)
     pool exhaust()
     mainJob module main? = true
 
-    Resolver new(C89Backend new(), mainJob module) start()
+    Resolver new(params, mainJob module) start()
     
 }

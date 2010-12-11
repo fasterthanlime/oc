@@ -7,5 +7,5 @@ if [[ ! -e .libs/NagaQueen.o ]]; then
 fi
 echo "Compiling oc"
 #OOC_LIBS=.. OOC_DIST=/blue/Dev/rock gdb --args rock -allerrors -g -v -sourcepath=source main .libs/NagaQueen.o -o=bin/oc $OOC_FLAGS
-OOC_LIBS=.. rock -g +-rdynamic -v -debuglibcache -sourcepath=source main .libs/NagaQueen.o -o=bin/oc $OOC_FLAGS
+OOC_LIBS=.. rock -g +-rdynamic -allerrors -v -debuglibcache -sourcepath=source main .libs/NagaQueen.o -o=bin/oc $OOC_FLAGS
 #OOC_LIBS=.. rock -noclean -nolines +-O3 -allerrors -v -debuglibcache -sourcepath=source main .libs/NagaQueen.o -o=bin/oc $OOC_FLAGS
