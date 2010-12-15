@@ -1,2 +1,2 @@
 #!/bin/bash
-rm -rf .libs rock_tmp
+rm -rf .libs rock_tmp build plugins/*

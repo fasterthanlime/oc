@@ -1,0 +1,12 @@
+#!/bin/sh
+
+if [[ ! -e $PREFIX ]]; then
+    PREFIX=/usr
+fi
+LIBPATH=$PREFIX/lib
+
+sudo cp -f plugins/lib*.so $LIBPATH/
+
+if [[ ! -e $PREFIX/bin/oc ]]; then
+    sudo ln -s $PWD/bin/oc /usr/bin/oc
+fi
