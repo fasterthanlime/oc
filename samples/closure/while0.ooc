@@ -8,6 +8,6 @@ while0: func (cond: Func -> Bool, block: Func) {
     )
 }
 
-while0(|| 1, ||
+while0(func -> int { 1 }, ||
     printf("%s\n", "Hi there!")
 )

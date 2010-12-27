@@ -3,6 +3,6 @@
 bin/*
 build/*
 plugins/*
-core
+dammit
 callgrind.out.*
 a.out
