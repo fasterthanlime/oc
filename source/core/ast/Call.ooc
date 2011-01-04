@@ -21,7 +21,7 @@ Call: class extends Expression {
     }
 
     toString: func -> String {
-        subject toString() + "()"
+        subject toString() + "(" + args map(|x| x toString()) join(", ") + ")"
     }
     
     getType: func -> Type {

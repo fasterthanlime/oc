@@ -1,7 +1,7 @@
 
 import structs/[ArrayList, HashMap]
 
-import Expression, Statement, Scope, Var, Type, Access, Return
+import Expression, Statement, Scope, Var, Type, Access, Return, Call
 import middle/Resolver
 
 FuncDecl: class extends Expression {
@@ -49,7 +49,17 @@ FuncDecl: class extends Expression {
         resolved = true // artificial testing
         
         task queue(body)
+        inferType(task)
         autoReturn(task)
+    }
+    
+    inferType: func (task: Task) {
+        match (task parent node) {
+            case c: Call =>
+                "Parent of %s is call %s" printfln(toString(), c toString())
+                idx := c args indexOf(this)
+                "idx = %d, ref = %s" printfln(idx, c ref ? c ref toString() : "(nil)")
+        }
     }
     
     autoReturn: func (task: Task) {

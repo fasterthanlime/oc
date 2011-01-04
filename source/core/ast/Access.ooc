@@ -17,7 +17,7 @@ Access: class extends Expression {
     }
 
     toString: func -> String {
-        (expr ? expr toString() : " ") + name
+        (expr ? expr toString() + " " : "") + name
     }
 
     resolve: func (task: Task) {
