@@ -6,3 +6,4 @@ plugins/*
 dammit
 callgrind.out.*
 a.out
+*.so

@@ -64,11 +64,11 @@ DynamicLoader: class {
                 return null
             }
             
-            callableLoad: Func
-            callableLoad as Closure thunk = loadAddress
-            callableLoad()
+            callableLoad: Closure 
+            callableLoad thunk = loadAddress
+            (callableLoad as Func)()
             
-            // call cosntructor
+            // call constructor
             constructorSymbolName := "backend_%s_Backend__%s_Backend_new" format(name, name)
             constructorAddress := dlsym(handle, constructorSymbolName)
             if(!constructorAddress) {
@@ -77,10 +77,11 @@ DynamicLoader: class {
                 return null
             }
             
-            callableConstructor: Func -> Backend
-            callableConstructor as Closure thunk = constructorAddress
+            callableConstructor: Closure
+            callableConstructor thunk = constructorAddress
             
-            backend := callableConstructor()
+	    backend: Backend
+	    backend = (callableConstructor as Func -> Backend)()
             if(!backend) {
                 "Couldn't instantiate backend for '%s', please report this bug to backend maintainers" printfln(name)
             }

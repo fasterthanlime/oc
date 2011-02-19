@@ -49,17 +49,61 @@ FuncDecl: class extends Expression {
         resolved = true // artificial testing
         
         task queue(body)
-        inferType(task)
-        autoReturn(task)
-    }
-    
-    inferType: func (task: Task) {
+
         match (task parent node) {
             case c: Call =>
                 "Parent of %s is call %s" printfln(toString(), c toString())
-                idx := c args indexOf(this)
-                "idx = %d, ref = %s" printfln(idx, c ref ? c ref toString() : "(nil)")
+		while(c subject ref == null) {
+		    "ref = %s" printfln(c subject ref ? c subject ref toString() : "(nil)")
+		    "C subject's ref is null, yielding" println()
+		    task parent queue(c subject)
+		    "Back here!" println()
+		}
+		inferType(c)
         }
+
+        autoReturn(task)
+    }
+    
+    inferType: func (outerCall: Call) {
+	"outerCall = %s" printfln(outerCall toString())
+
+	// idx is our position in the call arguments, or -1 if we're not an argument of outerCall
+	idx := outerCall args indexOf(this)
+	if(idx == -1) {
+	    "Decl %s is a child of task for call %s but it's not in its arguments!" printfln(toString(), outerCall toString())
+	    return
+	}
+	"idx = %d" printfln(idx)
+
+	// callRef is the Var that our outer call's subject has been resolved to
+	callRef := outerCall subject ref
+	if(!callRef getType() instanceOf?(FuncType)) {
+	    Exception new("Should never happen: outer call %s was resolved to something that's not a function! (ie. %s)" \
+		format(outerCall toString(), callRef getType() toString())) throw()
+	}
+	"callRef = %s" printfln(callRef toString())
+
+	// callProto is the FuncDecl which defines the argument types of the reference of the outer call
+	callProto := callRef getType() as FuncType proto
+	"callProto = %s" printfln(callRef toString())
+
+	// outerType is the type that the outer call expects us to be. Our actual type is getType()
+	outerType := callProto args get(callProto args getKeys() get(idx)) getType()
+	if(!outerType instanceOf?(FuncType)) {
+	    Exception new("Passing a function (ie. %s) to a %s where expecting a %s (%s)" format(toString(), callProto toString(), outerType toString(), outerType class name)) throw()
+	}
+	"outerType = %s" printfln(outerType toString())
+
+	outerProto := outerType as FuncType proto
+	"outerProto = %s" printfln(outerProto toString())
+
+	if(outerProto args size != args size) {
+	    Exception new("Function %s is not compatible with type %s" format(toString(), outerProto toString())) throw()
+	}
+
+	"Inferring return type of %s to be %s" printfln(toString(), outerProto retType toString())
+	retType = outerProto retType
     }
     
     autoReturn: func (task: Task) {

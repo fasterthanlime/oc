@@ -8,8 +8,6 @@ Call: class extends Expression {
 
     subject: Access { get set }
     args: List<Expression> { get set }
-    
-    ref: Expression
 
     init: func (=subject) {
         args = ArrayList<Expression> new()

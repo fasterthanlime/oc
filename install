@@ -5,7 +5,7 @@ if [[ ! -e $PREFIX ]]; then
 fi
 LIBPATH=$PREFIX/lib
 
-sudo cp -f plugins/lib*.so $LIBPATH/
+sudo cp -f plugins/*.so $LIBPATH/
 
 if [[ ! -e $PREFIX/bin/oc ]]; then
     sudo ln -s $PWD/bin/oc /usr/bin/oc

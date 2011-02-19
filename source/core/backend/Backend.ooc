@@ -9,5 +9,5 @@ Backend: abstract class {
     resolveAccess: func (acc: Access, task: Task, suggest: Func (Var)) {
         "resolveAccess(%s) in %s" printfln(acc toString(), class name)
     }
-    
+
 }
