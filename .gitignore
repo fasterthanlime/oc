@@ -7,3 +7,4 @@ dammit
 callgrind.out.*
 a.out
 *.so
+*.swp
