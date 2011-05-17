@@ -1,5 +1,5 @@
 
-import AstBuilder
+import Frontend
 
 import ast/[Module, Import]
 import middle/Resolver
@@ -21,6 +21,8 @@ ParsingPool: class {
     todo := ArrayList<ParsingJob> new()
     done := ArrayList<ParsingJob> new()
     workers := ArrayList<ParserWorker> new()
+    
+    factory: FrontendFactory
 
     active := true
 
@@ -28,7 +30,9 @@ ParsingPool: class {
 
     init: func {
         doneMutex = Mutex new()
-        todoMutex = Mutex new()        
+        todoMutex = Mutex new()
+        // TODO: make frontends choosable from the command line
+        factory = DynamicLoader loadFrontend("nagaqueen", this)
     }
 
     push: func (j: ParsingJob) {
@@ -98,7 +102,7 @@ ParserWorker: class {
                 if(job) {
                     busy = true
                     "Parsing %s [%d]" printfln(job path, id)
-                    builder := AstBuilder new(pool)
+                    builder := pool factory create()
                     builder parse(job path)
                     job module = builder module
                     if(job _import) job _import module = builder module
