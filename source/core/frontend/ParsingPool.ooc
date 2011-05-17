@@ -1,8 +1,9 @@
 
-import Frontend
+import Frontend, BuildParams
 
 import ast/[Module, Import]
 import middle/Resolver
+import ../DynamicLoader
 
 import threading/Thread, structs/[List, ArrayList], os/[Time, System]
 
@@ -28,11 +29,11 @@ ParsingPool: class {
 
     doneMutex, todoMutex: Mutex
 
-    init: func {
+    init: func (params: BuildParams) {
         doneMutex = Mutex new()
         todoMutex = Mutex new()
         // TODO: make frontends choosable from the command line
-        factory = DynamicLoader loadFrontend("nagaqueen", this)
+        factory = DynamicLoader loadFrontend("nagaqueen", params, this)
     }
 
     push: func (j: ParsingJob) {

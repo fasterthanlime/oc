@@ -36,16 +36,16 @@ DynamicLoader: class {
         exit(0)
     }
     
-    findPlugin: func (name: String, callback: Func (LibHandle)) {
+    findPlugin: static func (name: String, params: BuildParams, callback: Func (LibHandle)) {
         plugins getChildren() each(|child|
-            if(child name() startsWith?(prefix)) {
+            if(child name() startsWith?(name)) {
                 if(params verbose > 0) "Found plug-in %s in %s" printfln(name, child path)
                 
                 handle := dlopen(child path, RTLD_LAZY)
                 if(handle) {
                     callback(handle)
                 } else {
-                    "Error while opening plug-in %s: %s" printfln(path, dlerror())
+                    "Error while opening plug-in %s: %s" printfln(child path, dlerror())
                 }
             } else {
                 if(params verbose > 0) "Ignoring %s" printfln(child path)
@@ -55,7 +55,7 @@ DynamicLoader: class {
     
     loadBackend: static func (name: String, params: BuildParams) -> Backend {
         backend: Backend = null
-        findPlugin(name + "_backend", |handle|
+        This findPlugin(name + "_backend", params, |handle|
             classPrefix := "backend_%s_Backend_" format(name)
         
             // call load
@@ -73,7 +73,7 @@ DynamicLoader: class {
             // call constructor
             constructorAddress := dlsym(handle, classPrefix + "Backend_new")
             if(!constructorAddress) {
-                "Symbol '%s' not found in %s" printfln(constructorSymbolName, name)
+                "Symbol '%s' not found in %s" printfln(classPrefix + "Backend_new", name)
                 dlclose(handle)
                 return null
             }
@@ -90,9 +90,9 @@ DynamicLoader: class {
         backend
     }
     
-    loadFrontend: static func (name: String, pool: ParsingPool) -> FrontendFactory {
+    loadFrontend: static func (name: String, params: BuildParams, pool: ParsingPool) -> FrontendFactory {
         factory: FrontendFactory = null
-        findPlugin(name + "_frontend", |handle|
+        This findPlugin(name + "_frontend", params, |handle|
             classPrefix := "frontend_%s_FrontendFactory_" format(name)
         
             // call load
@@ -110,7 +110,7 @@ DynamicLoader: class {
             // call constructor
             constructorAddress := dlsym(handle, classPrefix + "FrontendFactory_new")
             if(!constructorAddress) {
-                "Symbol '%s' not found in %s" printfln(constructorSymbolName, name)
+                "Symbol '%s' not found in %s" printfln(classPrefix + "FrontendFactory_new", name)
                 dlclose(handle)
                 return null
             }

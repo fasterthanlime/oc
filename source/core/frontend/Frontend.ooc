@@ -30,4 +30,6 @@ FrontendFactory: abstract class {
     
     init: func (pool: ParsingPool) {}
     
+    create: abstract func -> Frontend
+    
 }

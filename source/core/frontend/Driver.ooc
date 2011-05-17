@@ -7,13 +7,13 @@ Driver: class {
     
     compile: static func (file: String, params: BuildParams) {
 
-	if(!File new(file) exists?()) {
-	    "File not found: %s, bailing out" printfln(file)
-	    exit(1)
-	}
+        if(!File new(file) exists?()) {
+            "File not found: %s, bailing out" printfln(file)
+            exit(1)
+        }
 
         // parse main module and dependencies!
-        pool := ParsingPool new()
+        pool := ParsingPool new(params)
         mainJob := ParsingJob new(file, null)
         pool push(mainJob)
         pool exhaust()
