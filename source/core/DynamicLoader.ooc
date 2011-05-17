@@ -70,6 +70,8 @@ DynamicLoader: class {
             callableLoad thunk = loadAddress
             (callableLoad as Func)()
             
+            classPrefix = "backend_%s_Backend__%s_" format(name, name)
+            
             // call constructor
             constructorAddress := dlsym(handle, classPrefix + "Backend_new")
             if(!constructorAddress) {
@@ -93,7 +95,7 @@ DynamicLoader: class {
     loadFrontend: static func (name: String, params: BuildParams, pool: ParsingPool) -> FrontendFactory {
         factory: FrontendFactory = null
         This findPlugin(name + "_frontend", params, |handle|
-            classPrefix := "frontend_%s_FrontendFactory_" format(name)
+            classPrefix := "frontend_%s_Frontend_" format(name)
         
             // call load
             loadAddress := dlsym(handle, classPrefix + "load")
@@ -107,10 +109,12 @@ DynamicLoader: class {
             callableLoad thunk = loadAddress
             (callableLoad as Func)()
             
+            classPrefix = "frontend_%s_Frontend__%s_FrontendFactory_" format(name, name)
+            
             // call constructor
-            constructorAddress := dlsym(handle, classPrefix + "FrontendFactory_new")
+            constructorAddress := dlsym(handle, classPrefix + "new")
             if(!constructorAddress) {
-                "Symbol '%s' not found in %s" printfln(classPrefix + "FrontendFactory_new", name)
+                "Symbol '%s' not found in %s" printfln(classPrefix + "new", name)
                 dlclose(handle)
                 return null
             }
