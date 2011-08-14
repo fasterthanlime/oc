@@ -1,0 +1,8 @@
+
+
+getInt := func -> Int {
+    
+}
+
+getInt()
+

@@ -12,6 +12,7 @@ BuildParams: class {
     self := ""
     home := "."
     verbose := 0
+    dump? := false
     leftOver: HashMap<String, String>
     
     sourcepath := ["."] as ArrayList<String>
@@ -29,6 +30,8 @@ BuildParams: class {
                 outpath = val
             case "backend" =>
                 backendString = val
+	    case "dump" =>
+		dump? = true
             case "v" || "verbose" =>
                 verbose += 1
             case "V" =>

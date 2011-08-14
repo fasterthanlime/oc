@@ -14,7 +14,7 @@ import Node, FuncDecl, Call, Import, Scope, Access, Var
 Module: class extends Node {
 
     /**
-     * The fullname is somemthing like: "my/package/MyModule".
+     * The fullname is something like: "my/package/MyModule".
      * It doesn't contain ".ooc", and it's always '/', never '\' even
      * on win32 platforms.
      */
