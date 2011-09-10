@@ -25,7 +25,10 @@ fi
 rock $OOC_FLAGS -libfolder=$ROCK_DIST/sdk -dynamiclib=$LIBDIR/librock-sdk.so || exit 1
 
 echo "Compiling oc (core)"
-rock $OOC_FLAGS -libfolder=source/core -dynamiclib=$LIBDIR/liboc-core.so $OOC_FLAGS || exit 2
+rock $OOC_FLAGS -libfolder=source/core -dynamiclib=$LIBDIR/liboc-core.so || exit 2
 
 echo "Compiling oc (launcher)"
-rock $OOC_FLAGS -sourcepath=source -packagefilter=launcher launcher/main -L$LIBDIR -gc=dynamic -lrock-sdk -loc-core -lnagaqueen -o=bin/oc $OOC_FLAGS || exit 1
+rock $OOC_FLAGS -sourcepath=source -packagefilter=launcher launcher/main -L$LIBDIR -gc=dynamic -lrock-sdk -loc-core -lnagaqueen -o=bin/oc $OOC_FLAGS || exit 3
+
+echo "Compiling pseudo backend"
+rock $OOC_FLAGS -libfolder=source/pseudo-backend -dynamiclib=plugins/pseudo_backend.so || exit 4

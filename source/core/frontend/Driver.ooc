@@ -3,6 +3,7 @@ import frontend/[ParsingPool, BuildParams]
 import io/File
 import middle/Resolver
 import ast/Module
+import ../DynamicLoader
 
 Driver: class {
     
@@ -19,14 +20,12 @@ Driver: class {
         pool push(mainJob)
         pool exhaust()
 
-	if(params dump?) pool done each(|j| 
-	    "--dump is enabled, here's the AST of %s" printfln(j module fullName)
-	    "" println()
-	    "================================================" printfln()
-	    j module toString() println()
-	    "================================================" printfln()
-	    "" println()
-	)
+	if(params dump?) {
+	    pseudoBackend := DynamicLoader loadBackend("pseudo", params)
+	    pool done each(|j| 
+		pseudoBackend process(j module, params)
+	    )
+	}
         
         mainJob module main? = true
         Resolver new(params, mainJob module) start()
