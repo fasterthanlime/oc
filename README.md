@@ -10,10 +10,10 @@ You can install oc easily in only 42 steps:
   * Make yourself a favor and [grab hub](http://defunkt.io/hub/) while you're at it.
   * Then go all like:
 
-> export OOC_DIR=~/ooc
-> mkdir -p $OOC_DIR && cd $OOC_DIR
-> hub clone nddrylliog/rock && cd rock
-> make rescue && sudo make install
+> export OOC_DIR=~/ooc  
+> mkdir -p $OOC_DIR && cd $OOC_DIR  
+> hub clone nddrylliog/rock && cd rock  
+> make rescue && sudo make install  
 
   * This should end with 'Congrats! You have a rock in bin/rock. If it does nawt, [report an issue](https://github.com/nddrylliog/rock/issues).
   * Now it's time to get greg and nagaqueen!
