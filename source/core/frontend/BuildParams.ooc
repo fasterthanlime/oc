@@ -5,6 +5,8 @@ import structs/[ArrayList, HashMap]
 import backend/Backend
 import DynamicLoader
 
+BUILD_DATE: extern CString
+
 BuildParams: class {
     
     VERSION := static "0.0"
@@ -35,7 +37,7 @@ BuildParams: class {
             case "v" || "verbose" =>
                 verbose += 1
             case "V" =>
-                "oc v%s - huhu" printfln(VERSION)
+                "oc v%s - built on %s" printfln(VERSION, BUILD_DATE)
                 exit(0)
             case "self" =>
                 self = val
