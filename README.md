@@ -18,23 +18,23 @@ You can install oc easily in only 42 steps:
   * This should end with 'Congrats! You have a rock in bin/rock. If it does nawt, [report an issue](https://github.com/nddrylliog/rock/issues).
   * Now it's time to get greg and nagaqueen!
 
-> cd $OOC_DIR
-> hub clone nddrylliog/greg && cd greg
-> make && sudo make install
+> cd $OOC_DIR  
+> hub clone nddrylliog/greg && cd greg  
+> make && sudo make install  
 
-> cd $OOC_DIR
-> hub clone nddrylliog/nagaqueen
+> cd $OOC_DIR  
+> hub clone nddrylliog/nagaqueen  
 
   * Now we'll grab oc, along with a frontend and a backend, and compile the shiznit out of it:
 
-> cd $OOC_DIR
-> hub clone nddrylliog/oc
-> hub clone nddrylliog/oc-nagaqueen
-> hub clone nddrylliog/oc-c89
-> export PREFIX=$OOC_DIR/oc/prefix
-> cd oc-nagaqueen && ./make && cd ..
-> cd oc-c89 && ./make && cd ..
-> cd oc && ./make && sudo make install
+> cd $OOC_DIR  
+> hub clone nddrylliog/oc  
+> hub clone nddrylliog/oc-nagaqueen  
+> hub clone nddrylliog/oc-c89  
+> export PREFIX=$OOC_DIR/oc/prefix  
+> cd oc-nagaqueen && ./make && cd ..  
+> cd oc-c89 && ./make && cd ..  
+> cd oc && ./make && sudo make install  
 
   * If everything went fine, you should now be the happy owner of an oc setup!
   * Since oc is entirely modular, feel free to write another frontend, or another
