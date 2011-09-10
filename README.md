@@ -6,7 +6,10 @@ oc is an [ooc](http://ooc-lang.org) compiler written in ooc. It focuses on clean
 
 You can install oc easily in only 42 steps:
 
-  * Install boehm-gc, **with thread support** (e.g. 'threads' USEflag on Gentoo). Make sure it's recent, too.
+  * Install [boehm-gc](http://www.hpl.hp.com/personal/Hans_Boehm/gc/), **with thread support**. If your distribution has libgc by default, you can run:
+
+> nm -D /usr/lib/libgc.so | grep GC_pthread_create
+
   * Make yourself a favor and [grab hub](http://defunkt.io/hub/) while you're at it.
   * Then go all like:
 
