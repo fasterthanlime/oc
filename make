@@ -1,5 +1,5 @@
 #!/bin/bash
-mkdir -p bin .libs
+mkdir -p bin .libs plugins
 
 if [[ ! -e $PREFIX ]]; then
     export PREFIX=$PWD/prefix
