@@ -22,6 +22,7 @@ BuildParams: class {
     
     backend: Backend = null
     backendString := ""
+    frontendString := ""
     
     init: func (map: HashMap<String, String>) {
         
@@ -30,6 +31,8 @@ BuildParams: class {
                 sourcepath = val
             case "outpath" =>
                 outpath = val
+            case "frontend" =>
+                frontendString = val
             case "backend" =>
                 backendString = val
 	    case "dump" =>
@@ -51,6 +54,11 @@ BuildParams: class {
         if(backendString == "") {
             if(verbose > 0) "No backend selected, using C89 backend" println()
             backendString = "c89"
+        }
+
+        if(frontendString == "") {
+            if(verbose > 0) "No frontend selected, using nagaqueen backend" println()
+            frontendString = "nagaqueen"
         }
     }
     

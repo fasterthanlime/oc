@@ -32,8 +32,7 @@ ParsingPool: class {
     init: func (params: BuildParams) {
         doneMutex = Mutex new()
         todoMutex = Mutex new()
-        // TODO: make frontends choosable from the command line
-        factory = DynamicLoader loadFrontend("nagaqueen", params, this)
+        factory = DynamicLoader loadFrontend(params frontendString, params, this)
         if(!factory) {
             fprintf(stderr, "Couldn't load frontend nagaqueen, bailing out\n")
             exit(1)
