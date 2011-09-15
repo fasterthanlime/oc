@@ -54,4 +54,8 @@ Scope: class extends Node {
         body add(s)
     }
 
+    toString: func -> String {
+        "{}"
+    }
+
 }
