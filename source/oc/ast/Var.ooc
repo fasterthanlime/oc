@@ -1,6 +1,6 @@
 
 
-import middle/Resolver
+import oc/middle/Resolver
 import Type, Expression
 
 Var: class extends Expression {

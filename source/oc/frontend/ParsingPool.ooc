@@ -1,9 +1,9 @@
 
 import Frontend, BuildParams
 
-import ast/[Module, Import]
-import middle/Resolver
-import ../DynamicLoader
+import oc/ast/[Module, Import]
+import oc/middle/Resolver
+import oc/DynamicLoader
 
 import threading/Thread, structs/[List, ArrayList], os/[Time, System]
 

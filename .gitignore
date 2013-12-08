@@ -8,3 +8,4 @@ callgrind.out.*
 a.out
 *.so
 *.swp
+.sam-cache

@@ -1,12 +1,12 @@
 
 import ParsingPool
-import ast/Module
+import oc/ast/Module
 
 /**
  * Interface for pluggable frontends
  */
 Frontend: abstract class {
-    
+
     module: Module
     pool: ParsingPool
     

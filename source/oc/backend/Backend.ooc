@@ -1,6 +1,6 @@
-import ast/[Module, Access, Var]
-import middle/Resolver
-import frontend/BuildParams
+import oc/ast/[Module, Access, Var]
+import oc/middle/Resolver
+import oc/frontend/BuildParams
 
 /**
  * Interface for pluggable backends in oc-c89

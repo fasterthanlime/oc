@@ -1,8 +1,8 @@
 
 import structs/[ArrayList, List]
 
-import frontend/BuildParams
-import middle/Resolver
+import oc/frontend/BuildParams
+import oc/middle/Resolver
 import Node, FuncDecl, Call, Import, Scope, Access, Var
 
 /**

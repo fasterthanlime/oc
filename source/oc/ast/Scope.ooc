@@ -1,7 +1,7 @@
 
 import structs/[ArrayList, List]
 
-import middle/Resolver
+import oc/middle/Resolver
 import Node, Statement, Var, Access
 
 Scope: class extends Node {

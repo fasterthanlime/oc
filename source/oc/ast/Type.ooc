@@ -1,7 +1,7 @@
 
 
+import oc/middle/Resolver
 import Node, FuncDecl
-import middle/Resolver
 
 Type: abstract class extends Node {
 

@@ -1,3 +1,5 @@
 Name: oc
 Description: an ooc compiler
-SourcePath: source/core
+SourcePath: source
+Main: oc/oc
+BinaryPath: bin/oc

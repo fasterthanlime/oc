@@ -1,5 +1,5 @@
 
-import middle/Resolver
+import oc/middle/Resolver
 
 import Access, Var // for resolveAccess
 

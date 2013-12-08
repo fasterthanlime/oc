@@ -1,9 +1,9 @@
 
 import os/Coro, structs/[ArrayList, List, Stack, HashBag]
 
-import ast/[Node, Module]
-import ../backend/Backend
-import ../frontend/BuildParams
+import oc/ast/[Node, Module]
+import oc/backend/Backend
+import oc/frontend/BuildParams
 
 Task: class {
     resolver: Resolver

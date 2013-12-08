@@ -1,6 +1,6 @@
 
 
-import middle/Resolver
+import oc/middle/Resolver
 import Expression, Type, Var, Node, Scope, Statement, FuncDecl
 
 Access: class extends Expression {

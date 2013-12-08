@@ -1,7 +1,6 @@
 
+import oc/middle/Resolver
 import Statement, Expression
-
-import middle/Resolver
 
 Return: class extends Statement {
 

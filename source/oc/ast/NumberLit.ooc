@@ -14,9 +14,10 @@ NumberLit: class extends Expression {
 
     format: NumberFormat
     value: String
-    type := static BaseType new("int") // well, maybe
 
-    init: func (=format, =value) {}
+    init: func (=format, =value) {
+        type = BaseType new("int") // well, maybe
+    }
 
     resolve: func (task: Task) {
         task queue(type)

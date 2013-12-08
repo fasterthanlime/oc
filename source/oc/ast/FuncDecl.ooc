@@ -1,8 +1,8 @@
 
 import structs/[ArrayList, HashMap]
 
+import oc/middle/Resolver
 import Expression, Statement, Scope, Var, Type, Access, Return, Call
-import middle/Resolver
 
 FuncDecl: class extends Expression {
 

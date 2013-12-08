@@ -7,7 +7,7 @@ import frontend/BuildParams
 import frontend/[ParsingPool, Frontend]
 
 DynamicLoader: class {
-    
+
     plugins: static File
 
     init: static func (params: BuildParams) {
@@ -25,7 +25,7 @@ DynamicLoader: class {
         
         if(params verbose > 0) {
             "oc v%s  sourcepath = %s  outpath = %s  backend is %s" printfln(params VERSION, params sourcepath join(":"), params outpath, params backend class name)
-            "-----------------------------------------------------------------------"
+            "-----------------------------------------------------------------------" println()
         }
     }
     
@@ -38,7 +38,7 @@ DynamicLoader: class {
     
     findPlugin: static func (name: String, params: BuildParams, callback: Func (LibHandle)) {
         plugins getChildren() each(|child|
-            if(child name() startsWith?(name)) {
+            if(child name startsWith?(name)) {
                 if(params verbose > 0) "Found plug-in %s in %s" printfln(name, child path)
                 
                 handle := dlopen(child path, RTLD_LAZY)
@@ -63,12 +63,13 @@ DynamicLoader: class {
             if(!loadAddress) {
                 "Symbol '%s' not found in %s" printfln(classPrefix + "load", name)
                 dlclose(handle)
-                return null
+                return
             }
             
             callableLoad: Closure 
             callableLoad thunk = loadAddress
-            (callableLoad as Func)()
+            callableLoadF := callableLoad as Func
+            callableLoadF()
             
             classPrefix = "backend_%s_Backend__%s_" format(name, name)
             
@@ -77,13 +78,14 @@ DynamicLoader: class {
             if(!constructorAddress) {
                 "Symbol '%s' not found in %s" printfln(classPrefix + "Backend_new", name)
                 dlclose(handle)
-                return null
+                return
             }
             
             callableConstructor: Closure
             callableConstructor thunk = constructorAddress
+            callableConstructorF := callableConstructor as Func -> Backend
             
-            backend = (callableConstructor as Func -> Backend)()
+            backend = callableConstructorF()
             if(!backend) {
                 "Couldn't instantiate backend for '%s', please report this bug to backend maintainers" printfln(name)
             }
@@ -102,12 +104,13 @@ DynamicLoader: class {
             if(!loadAddress) {
                 "Symbol '%s' not found in %s" printfln(classPrefix + "load", name)
                 dlclose(handle)
-                return null
+                return
             }
             
             callableLoad: Closure 
             callableLoad thunk = loadAddress
-            (callableLoad as Func)()
+            callableLoadF := callableLoad as Func
+            callableLoadF()
             
             classPrefix = "frontend_%s_Frontend__%s_FrontendFactory_" format(name, name)
             
@@ -116,13 +119,14 @@ DynamicLoader: class {
             if(!constructorAddress) {
                 "Symbol '%s' not found in %s" printfln(classPrefix + "new", name)
                 dlclose(handle)
-                return null
+                return
             }
             
             callableConstructor: Closure
             callableConstructor thunk = constructorAddress
+            callableConstructorF := callableConstructor as Func -> FrontendFactory
             
-            factory = (callableConstructor as Func -> FrontendFactory)()
+            factory = callableConstructorF()
             if(!factory) {
                 "Couldn't instantiate frontend for '%s', please report this bug to frontend maintainers" printfln(name)
             }

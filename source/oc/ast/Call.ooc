@@ -1,7 +1,7 @@
 
 import structs/[List, ArrayList]
 
-import middle/Resolver
+import oc/middle/Resolver
 import FuncDecl, Expression, Access, Type
 
 Call: class extends Expression {

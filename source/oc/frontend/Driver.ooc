@@ -1,9 +1,10 @@
 
-import frontend/[ParsingPool, BuildParams]
 import io/File
-import middle/Resolver
-import ast/Module
-import ../DynamicLoader
+
+import oc/middle/Resolver
+import oc/ast/Module
+import oc/DynamicLoader
+import oc/frontend/[ParsingPool, BuildParams]
 
 Driver: class {
     
