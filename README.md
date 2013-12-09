@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/nddrylliog/oc.png?branch=master)](https://travis-ci.org/nddrylliog/oc)
+
 # oc
 
 oc is an [ooc][ooc] compiler written in ooc. It focuses on clean design,
