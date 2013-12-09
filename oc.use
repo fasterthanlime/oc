@@ -5,3 +5,4 @@ Main: oc/oc
 BinaryPath: bin/oc
 Libs: -lnagaqueen
 LibPaths: libs
+OocLibPaths: vendor

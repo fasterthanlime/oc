@@ -1,6 +1,6 @@
 
-use oc
-import oc/backend/c89/Ast
+use libovum
+import ovum/Ast
 
 main: func {
 
@@ -27,6 +27,6 @@ main: func {
                  
     s functions add(mainFunc)
     
-    s write("tmp/")
+    s write("ovum_tmp/")
 
 }

@@ -3,8 +3,8 @@
 import io/[File, FileWriter], structs/[List, ArrayList]
 import text/EscapeSequence
 
-// third
-import oc/io/OcWriter
+// ours
+import ovum/OWriter
 
 /**
  * Base class for any C node

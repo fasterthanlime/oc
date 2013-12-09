@@ -1,4 +1,4 @@
-use oc
+use oc, libovum
 
 // sdk
 import text/[Opts, EscapeSequence]
@@ -6,9 +6,10 @@ import structs/[HashMap, ArrayList, List]
 import io/[File, FileWriter]
 
 // ours
-import Ast, StackGenerator, headers/HeaderParser
+import StackGenerator
 
 // third
+import ovum/[Ast, HeaderParser]
 import oc/ast/[Module, Node, FuncDecl, Access, Var, Scope, Type,
        Call, StringLit, NumberLit, Statement, Expression, Return]
 import oc/middle/Resolver
