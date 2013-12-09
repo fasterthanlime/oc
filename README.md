@@ -25,8 +25,7 @@ If you fancy a bit of a cleanup, run
 
 > make clean
 
-## About the transition
+## Licensing
 
-Well, the project was abandoned for 2 years, but I'm sick of fixing rock
-bugs so I'm back on it for a while. Read the history of this file to
-have fun.
+oc is licensed under the MIT license. See the `LICENSE` file for details.
+
