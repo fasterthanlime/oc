@@ -10,6 +10,7 @@ main: func (mainArgs: ArrayList<String>) {
 
     opts := Opts new(mainArgs)
     params := BuildParams new(opts opts)
+
     if(opts args empty?()) {
         "Usage: oc file.ooc" println()
         exit(1)

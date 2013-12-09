@@ -28,6 +28,8 @@ Driver: class {
             )
         }
 
+        params backend = Plugins loadBackend(params backendString)
+
         mainJob module main? = true
         Resolver new(params, mainJob module) start()
 
