@@ -9,9 +9,9 @@ import frontend/BuildParams
 import frontend/[ParsingPool, Frontend]
 
 // enabled backends
-import oc/backend/c89/glue
-import oc/backend/pseudo/glue
-import oc/frontend/nagaqueen/glue
+import oc/backend/c89/c89glue
+import oc/backend/pseudo/pseudoglue
+import oc/frontend/nagaqueen/nqglue
 
 Plugins: class {
 
