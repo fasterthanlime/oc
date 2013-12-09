@@ -3,7 +3,7 @@
 import oc/ast/[Node, Expression, Statement]
 
 // leafs
-import oc/ast/[Access, Call, CoverDecl, FuncDecl, Import, Module, NumberLit,
+import oc/ast/[Access, Call, CoverDecl, FuncDecl, NumberLit,
        Return, Scope, StringLit, Type, Var]
 
 Inquisitor: abstract class {
@@ -12,9 +12,6 @@ Inquisitor: abstract class {
         if (!node) return
         node surrender(this)
     }
-
-    visitModule: func (m: Module)
-    visitImport: func (i: Import)
 
     visitCoverDecl: func (cd: CoverDecl)
     visitFuncDecl: func (e: FuncDecl)
@@ -28,8 +25,6 @@ Inquisitor: abstract class {
 
     visitNumberLit: func (nl: NumberLit)
     visitStringLit: func (sl: StringLit)
-
-    visitBaseType: func (bt: BaseType)
 
 }
 

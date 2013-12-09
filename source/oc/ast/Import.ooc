@@ -1,5 +1,4 @@
 
-import Inquisitor
 import Node, Module
 
 /**
@@ -15,9 +14,5 @@ Import: class extends Node {
     module: Module { get set }
 
     init: func (=importName) {}
-
-    surrender: func (inq: Inquisitor) {
-        inq visitImport(this)
-    }
 
 }

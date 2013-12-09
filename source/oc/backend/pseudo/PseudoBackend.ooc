@@ -65,7 +65,7 @@ PseudoGenerator: class extends Inquisitor {
 
     visitVar: func (v: Var) {
         "#{v name}: " print()
-        visitNode(v type)
+        visitType(v type)
         if (v expr) {
             " = " print()
             visitNode(v expr)
@@ -110,8 +110,17 @@ PseudoGenerator: class extends Inquisitor {
         ")" print()
     }
 
-    visitBaseType: func (bt: BaseType) {
-        bt name print()
+    visitType: func (t: Type) {
+        match t {
+            case null =>
+                "(null type)" println()
+            case bt: BaseType =>
+                bt name print()
+            case vt: VoidType =>
+                "void" print()
+            case =>
+                err("Unsupported type kind: #{t class name}")
+        }
     }
 
     visitAccess: func (a: Access) {
