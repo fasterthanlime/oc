@@ -4,6 +4,7 @@ use oc
 import structs/[HashMap, ArrayList, List]
 
 // ours
+import oc/ast/[Inquisitor]
 import oc/ast/[Module, Node, FuncDecl, Access, Var, Scope, Type,
        Call, StringLit, NumberLit, Statement, Expression, Return, CoverDecl]
 import oc/middle/Resolver
@@ -31,31 +32,15 @@ pseudo_Backend: class extends Backend {
 
 }
 
-PseudoGenerator: class {
+PseudoGenerator: class extends Inquisitor {
 
     module: Module
     params: BuildParams
 
-    map := HashMap<Class, CallBack> new()
-
     init: func (=module, =params) {
-        // setup hooks
-        put(CoverDecl,  |cd| visitCoverDecl(cd as CoverDecl))
-        put(FuncDecl,   |fd| visitFuncDecl(fd as FuncDecl))
-        put(Var,        |v|  visitVar(v as Var))
-        put(Scope,      |s|  visitScope(s as Scope))
-        put(Call,       |c|  visitCall(c as Call))
-        put(BaseType,   |bt| visitBaseType(bt as BaseType))
-        put(Access,     |a|  visitAccess(a as Access))
-        put(NumberLit,  |nl| visitNumberLit(nl as NumberLit))
-
         "-------------------------------------------------" println()
         visitModule(module)
         "-------------------------------------------------" println()
-    }
-
-    put: func (T: Class, f: Func (Node)) {
-        map put(T, CallBack new(f))
     }
 
     visitModule: func (m: Module) {
@@ -90,19 +75,6 @@ PseudoGenerator: class {
     visitCoverDecl: func (cd: CoverDecl) {
         "cover #{cd name}" println()
         visitScope(cd body)	
-    }
-
-    visitNode: func (n: Node) {
-        if (!n) {
-            "(nil)" print()
-            return
-        }
-        cb := map get(n class)
-        if(cb) {
-            cb f(n)
-        } else {
-            err("Unsupported node type: #{n class name}")
-        }
     }
 
     visitFuncDecl: func (fd: FuncDecl) {

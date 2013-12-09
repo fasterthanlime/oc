@@ -2,6 +2,8 @@
 import structs/[ArrayList, HashMap]
 
 import oc/middle/Resolver
+
+import Inquisitor
 import Expression, Statement, Scope, Var, Type, Access, Return, Call
 
 FuncDecl: class extends Expression {
@@ -147,6 +149,10 @@ FuncDecl: class extends Expression {
 
     getType: func -> Type {
         _type
+    }
+
+    surrender: func (inq: Inquisitor) {
+        inq visitFuncDecl(this)
     }
 
 }

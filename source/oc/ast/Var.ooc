@@ -1,6 +1,8 @@
 
 
 import oc/middle/Resolver
+
+import Inquisitor
 import Type, Expression
 
 Var: class extends Expression {
@@ -34,6 +36,10 @@ Var: class extends Expression {
 
     toString: func -> String {
         name + (type ? ": " + type toString() : " :") + (expr ? "= " + expr toString() : "")
+    }
+
+    surrender: func (inq: Inquisitor) {
+        inq visitVar(this)
     }
 
 }

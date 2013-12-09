@@ -1,5 +1,7 @@
 
 import Expression, Type
+
+import Inquisitor
 import oc/middle/Resolver
 
 /** Different number formats - in sync with nagaqueen's "IntFormat" */
@@ -31,6 +33,10 @@ NumberLit: class extends Expression {
 
     toString: func -> String {
         value
+    }
+
+    surrender: func (inq: Inquisitor) {
+        inq visitNumberLit(this)
     }
 
 }

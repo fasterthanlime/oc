@@ -1,5 +1,7 @@
 
 import oc/middle/Resolver
+
+import Inquisitor
 import Statement, Expression
 
 Return: class extends Statement {
@@ -14,6 +16,10 @@ Return: class extends Statement {
 
     toString: func -> String {
         expr ? "return " + expr toString() : "return"
+    }
+
+    surrender: func (inq: Inquisitor) {
+        inq visitReturn(this)
     }
 
 }

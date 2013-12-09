@@ -1,5 +1,7 @@
 
 import Expression, Type
+
+import Inquisitor
 import oc/middle/Resolver
 
 StringLit: class extends Expression {
@@ -17,6 +19,10 @@ StringLit: class extends Expression {
 
     toString: func -> String {
         "\"" + value + "\""
+    }
+
+    surrender: func (inq: Inquisitor) {
+        inq visitStringLit(this)
     }
 
 }

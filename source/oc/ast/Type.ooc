@@ -1,6 +1,8 @@
 
 
 import oc/middle/Resolver
+
+import Inquisitor
 import Node, FuncDecl
 
 Type: abstract class extends Node {
@@ -22,6 +24,10 @@ BaseType: class extends Type {
     }
     
     toString: func -> String { name }
+
+    surrender: func (inq: Inquisitor) {
+        inq visitBaseType(this)
+    }
 
 }
 

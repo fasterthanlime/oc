@@ -2,6 +2,8 @@
 import structs/[ArrayList, List]
 
 import oc/middle/Resolver
+
+import Inquisitor
 import Node, Statement, Var, Access
 
 Scope: class extends Node {
@@ -59,6 +61,10 @@ Scope: class extends Node {
 
     toString: func -> String {
         "{}"
+    }
+
+    surrender: func (inq: Inquisitor) {
+        inq visitScope(this)
     }
 
 }

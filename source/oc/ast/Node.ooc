@@ -1,5 +1,6 @@
 
 import oc/middle/Resolver
+import Inquisitor
 
 import Access, Var // for resolveAccess
 
@@ -19,6 +20,10 @@ Node: class {
 
     resolveAccess: func (acc: Access, task: Task, suggest: Func (Var)) {
         // <your ad here>
+    }
+
+    surrender: func (inq: Inquisitor) {
+        raise("#{class name} surrender(): stub!")
     }
 
 }

@@ -1,6 +1,7 @@
 
 
 import oc/middle/Resolver
+import Inquisitor
 import Expression, Type, Var, Node, Scope, Statement, FuncDecl
 
 Access: class extends Expression {
@@ -46,6 +47,10 @@ Access: class extends Expression {
         }
 
         if(marker && !ref global) marker markAccess(this)
+    }
+
+    surrender: func (inq: Inquisitor) {
+        inq visitAccess(this)
     }
 
 }

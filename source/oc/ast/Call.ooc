@@ -2,6 +2,8 @@
 import structs/[List, ArrayList]
 
 import oc/middle/Resolver
+
+import Inquisitor
 import FuncDecl, Expression, Access, Type
 
 Call: class extends Expression {
@@ -31,6 +33,10 @@ Call: class extends Expression {
                 Exception new("Trying to call something that's not a function! " + sType toString())
         }
         null
+    }
+
+    surrender: func (inq: Inquisitor) {
+        inq visitCall(this)
     }
 
 }
