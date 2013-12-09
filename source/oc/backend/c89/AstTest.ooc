@@ -1,4 +1,6 @@
-import C89Ast
+
+use oc
+import oc/backend/c89/Ast
 
 main: func {
 
@@ -9,7 +11,7 @@ main: func {
     
     mainFunc := CFunction new(type("int"), "main")
     mainFunc args add(var(type("int"), "argc")).
-                  add(var(type("char*"), "argv"))
+                  add(var(type("char**"), "argv"))
                  
     mainFunc body add(call("printf", str("Hi, world!\n")))
 
@@ -22,7 +24,6 @@ main: func {
 		  add(assign(accArrow(acc("john_doe"), "name"), str("John Doe"))).
 		  add(assign(accArrow(acc("john_doe"), "age"), int(42))).
 		  add(call("printf", str("His name is %s and his age is %d!\n"), accArrow(acc("john_doe"), "name"), accArrow(acc("john_doe"), "age")))
-
                  
     s functions add(mainFunc)
     

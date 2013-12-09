@@ -38,7 +38,7 @@ CSource: class extends CNode {
     functions := ArrayList<CFunction> new()
     types := ArrayList<CTypeDecl> new()
 
-    init: func (=name) {}
+    init: func (=name)
 
     write: func (basePath: String) {
         baseFile := File new(basePath, name) parent
@@ -327,11 +327,11 @@ CAccess: class extends CExpr {
     CIntLiteral: class extends CExpr {
         val: String
 
-        init: func ~fromInt (intVal: Int64) {
-            val = "%Ld" format(val)
+        init: func ~fromNumber (number: Int64) {
+            val = "%lld" format(number)
         }
 
-        init: func (=val) {}
+        init: func (=val)
 
         write: func (w: OcWriter) {
             w app(val)

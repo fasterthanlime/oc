@@ -2,14 +2,14 @@
 import io/[File, FileReader], os/[Time, Env], structs/HashMap
 
 PreprocessorReader: class extends FileReader {
-    
+
     init: func (path: String) {
         super(path)
     }
-    
+
     read: func ~char -> Char {
         c := super()
-		match c {
+        match c {
             case '\\' =>
                 if(super() == '\n')
                     return super() // ignore both, it's a line continuation
@@ -18,45 +18,45 @@ PreprocessorReader: class extends FileReader {
         }
         c
     }
-    
+
 }
 
 Header: class {
-    
+
     path: String
     fR: FileReader
     symbols := HashMap<String, String> new()
- 
+
     find: static func (name: String) -> Header {
-	file := File new("/usr/local/include", name)
-	if(file exists?()) return new(file path)
-	
-	file = File new("/usr/include", name)
-	if(file exists?()) return new(file path)
+        file := File new("/usr/local/include", name)
+        if(file exists?()) return new(file path)
 
-	// TODO: what about local includes?
-	cInc := Env get("C_INCLUDE_PATH") 
-	if(cInc) {
-	    file = File new(cInc, name)
-	    if(file exists?()) return new(file path)
-	}
+        file = File new("/usr/include", name)
+        if(file exists?()) return new(file path)
 
-	"Include <%s> not found!" printfln(name)
-	null
+        // TODO: what about local includes?
+        cInc := Env get("C_INCLUDE_PATH") 
+        if(cInc) {
+            file = File new(cInc, name)
+            if(file exists?()) return new(file path)
+        }
+
+        "Include <%s> not found!" printfln(name)
+        null
     }
-   
+
     init: func (=path) {
         fR = PreprocessorReader new(path)
-	parse()
+        parse()
     }
-    
+
     parse: func {
         lastId: String
-        
+
         while(fR hasNext?()) {
             skipComments()
             if(!fR hasNext?()) return
-            
+
             mark := fR mark()
             match (c1 := fR read()) {
                 case '#' =>
@@ -73,14 +73,14 @@ Header: class {
                         }
                     ) replaceAll("\n", "")
                     //"[%d] Got symbol %s(%s" printfln(mark, lastId, call)
-		    symbols put(lastId, call)
+                    symbols put(lastId, call)
                 case ';' =>
                     //"[%d] End of line, should probably handle stuff, just skipping for now!" printfln(mark)
                 case '*' =>
                     //"[%d] Pointer type, maybe? got *" printfln(mark)
                 case =>
                     fR rewind(1)
-                    
+
                     id := readIdentifier()
                     if(id) {
                         lastId = id
@@ -107,11 +107,11 @@ Header: class {
             }
         }
     }
-    
+
     readIdentifier: func -> String {
         mark := fR mark()
         c := fR read()
-        
+
         match {
             case c alpha?() || c == '_' =>
                 "%c%s" format(c, fR readWhile(|c| c alphaNumeric?() || c == '_'))
@@ -120,38 +120,38 @@ Header: class {
                 null
         }
     }
-    
+
     skipLine: func {
         fR readWhile(|c| c != '\n')
     }
-    
+
     skipWhitespace: func {
         fR readWhile(|c| c whitespace?())
     }
-    
+
     skipComments: func {
-        
+
         while(true) {
             skipWhitespace()
-       
+
             mark := fR mark()
             match (c1 := fR read()) {
                 case '/' => match(c2 := fR read()) {
                     case '/' => skipLine()
-                        //"[%d] skipped single-line comment!" printfln(mark); 
-                        continue
+                    //"[%d] skipped single-line comment!" printfln(mark); 
+                    continue
                     case '*' => fR skipUntil("*/"). rewind(1)
-                        //"[%d] skipped multi-line comment!"  printfln(mark);
-                        continue
+                    //"[%d] skipped multi-line comment!"  printfln(mark);
+                    continue
                 }
                 case =>
                     //"At %d, stumbled upon %c" printfln(mark, c1)
             }
-            
+
             fR reset(mark)
             break
         }
     }
-    
+
 }
 
