@@ -1,6 +1,6 @@
 
-NAGAQUEEN_DIR := ../nagaqueen
-NAGAQUEEN_LEG := $(NAGAQUEEN_DIR)/grammar/nagaqueen.leg
+NAGAQUEEN_DIR ?= ../nagaqueen
+NAGAQUEEN_LEG := ${NAGAQUEEN_DIR}/grammar/nagaqueen.leg
 NAGAQUEEN_C := source/oc/frontend/nagaqueen/NagaQueen.c
 NAGAQUEEN_LIB := libs/libnagaqueen.a
 
