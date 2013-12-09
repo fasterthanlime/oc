@@ -7,18 +7,16 @@ import oc/frontend/BuildParams
 
 Task: class {
     resolver: Resolver
-    
+
     id: Int { get set }
     idSeed := static 0
 
     parent: Task
     parentCoro, coro: Coro
 
-    oldStackBase: Pointer
-    
     node: Node { get set }
     done?: Bool { get set }
-    
+
     userdata: HashBag
 
     lastFree := static Stack<This> new()
@@ -47,7 +45,7 @@ Task: class {
             res
         }
     }
-    
+
     /**
      * Set userdata to this task
      */
@@ -55,17 +53,17 @@ Task: class {
         if(!userdata) userdata = HashBag new()
         userdata put(key, value)
     }
-    
+
     unset: func (key: String) {
         if(!userdata) return
         userdata remove(key)
     }
-    
+
     has: func (key: String) -> Bool {
         if(!userdata) return false
         userdata contains?(key)
     }
-    
+
     get: func <T> (key: String, T: Class) -> T {
         if(userdata) {
             return userdata get(key, T)
@@ -74,7 +72,7 @@ Task: class {
 
     start: func {
         version(OOC_TASK_DEBUG) { (toString() + " started") println() }
-        
+
         // Adjust the stackbottom and add our Coro's stack as a root for the GC
         parentCoro startCoro(coro, ||
             // This allows us to reuse tasks
@@ -135,10 +133,14 @@ Task: class {
             oldPool each(|task|
                 version(OOC_TASK_DEBUG) {  (toString() + " switching to unfinished task " + task toString()) println() }
                 switchTo(task)
-                if(!task done?) pool add(task)
+                if(!task done?) {
+                    pool add(task)
+                }
             )
 
-            if(!pool empty?()) yield()
+            if(!pool empty?()) {
+                yield()
+            }
         }
     }
 
@@ -158,22 +160,24 @@ Task: class {
 
     walkBackward: func (f: Func (Node) -> Bool) {
         if(f(node)) return // true = break
-        if(parent)
+        if(parent) {
             parent walkBackward(f)
+        }
     }
-    
+
     walkBackwardTasks: func ~withTask (f: Func (Task) -> Bool) {
         if(f(this)) return // true = break
-        if(parent)
+        if(parent) {
             parent walkBackwardTasks(f)
+        }
     }
 }
 
 ModuleTask: class extends Node {
     module: Module
-    
-    init: func (=module) {}
-    
+
+    init: func (=module)
+
     resolve: func (task: Task) {
         task queue(module)
         "Finished resolving %s!" printfln(module fullName)
@@ -203,7 +207,7 @@ Resolver: class extends Node {
             "" println()
             "========================== Looping! ===============" println()
             "" println()
-            
+
             mainCoro switchTo(mainTask coro)
         }
     }
@@ -213,3 +217,4 @@ Resolver: class extends Node {
     }
 
 }
+

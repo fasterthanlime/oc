@@ -12,21 +12,21 @@ CoverDecl: class extends Expression {
     _type: Type
 
     resolved := false // artificial testing
-    
+
     name: String { get set }
-    
+
     init: func ~_cover {
         name = ""
-	// type?
+        // type?
     }
-    
+
     resolve: func (task: Task) {
-	resolved = true // artificial testing
+        resolved = true // artificial testing
         task queue(body)
     }
-  
+
     toString: func -> String {
-	"cover " + body toString()
+        "cover " + body toString()
     }
 
     getType: func -> Type {

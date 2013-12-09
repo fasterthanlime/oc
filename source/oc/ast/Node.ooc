@@ -14,9 +14,9 @@ Node: class {
     }
 
     callResolver?: func -> Bool { false }
-    
+
     accessResolver?: func -> Bool { false }
-    
+
     resolveAccess: func (acc: Access, task: Task, suggest: Func (Var)) {
         // <your ad here>
     }

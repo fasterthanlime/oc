@@ -7,7 +7,7 @@ Access: class extends Expression {
 
     name: String { get set }
     expr: Expression { get set }
-    
+
     ref: Var { get set }
 
     init: func (=expr, =name) {}
@@ -22,16 +22,16 @@ Access: class extends Expression {
 
     resolve: func (task: Task) {
         marker : FuncDecl = null
-        
+
         if(expr) task queue(expr)
-        
+
         task walkBackward(|node|
             //"Resolving access %s, in node %s" printfln(toString(), node toString())
             node resolveAccess(this, task, |var|
                 ref = var
             )
             if(ref != null) return true // break if resolved
-            
+
             // if still not resolved and was a function, mark the access
             if(!marker && node class == FuncDecl) {
                 fd := node as FuncDecl
@@ -39,12 +39,12 @@ Access: class extends Expression {
             }
             false
         )
-        
+
         if(!ref) {
             "Undefined symbol `%s`" printfln(name)
             exit(1)
         }
-        
+
         if(marker && !ref global) marker markAccess(this)
     }
 

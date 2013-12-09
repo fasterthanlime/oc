@@ -26,9 +26,8 @@ Module: class extends Node {
     includes := ArrayList<String> new()
 
     main? : Bool { get set }
-    
-    init: func (=fullName) {}
 
+    init: func (=fullName)
 
     resolve: func (task: Task) {
         task queue(body)
@@ -43,23 +42,23 @@ Module: class extends Node {
         )
         list
     }
-    
+
     resolveAccess: func (acc: Access, task: Task, suggest: Func (Var)) {
         //"Resolving %s in %s, with %d import, task is %s" printfln(acc toString(), toString(), imports size, task toString())
-        
+
         task set("noindex", true)
         for(imp in imports) {
             imp module body resolveAccess(acc, task, suggest)
             if(acc ref) break
         }
         task unset("noindex")
-        
+
         if(!acc ref) {
             // combo X5!
             task resolver params backend resolveAccess(acc, task, suggest)
         }
     }
-    
+
     toString: func -> String {
         "module " + fullName
     }
