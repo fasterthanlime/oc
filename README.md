@@ -1,49 +1,32 @@
 # oc
 
-oc is an [ooc](http://ooc-lang.org) compiler written in ooc. It focuses on clean design, flexibility and scalability. oc is planned to replace [rock](http://github.com/nddrylliog/rock), the current standard ooc compiler.
+oc is an [ooc][ooc] compiler written in ooc. It focuses on clean design,
+flexibility and scalability.
+
+oc was at some point planned to replace [rock][rock], the current standard ooc
+compiler. But then life happened. Now it's mostly a fun playground.
+
+[ooc]: http://ooc-lang.org
+[rock]: http://github.com/nddrylliog/rock
 
 ## Building & installing
 
-You can install oc easily in only 42 steps:
+Get a functional rock by following instructions:
 
-  * Install [boehm-gc](http://www.hpl.hp.com/personal/Hans_Boehm/gc/), **with thread support**. If your distribution has libgc by default, you can run:
+  * <http://ooc-lang.org/install/>
 
-> nm -D /usr/lib/libgc.so | grep GC_pthread_create
+Then, just run:
 
-  * Make yourself a favor and [grab hub](http://defunkt.io/hub/) while you're at it.
-  * Then go all like:
+> make
 
-> export OOC_DIR=~/ooc  
-> mkdir -p $OOC_DIR && cd $OOC_DIR  
-> hub clone nddrylliog/rock && cd rock  
-> make rescue && sudo make install  
+oc will be in `bin/oc`.
 
-  * This should end with 'Congrats! You have a rock in bin/rock. If it does nawt, [report an issue](https://github.com/nddrylliog/rock/issues).
-  * Now it's time to get greg and nagaqueen!
+If you fancy a bit of a cleanup, run
 
-> cd $OOC_DIR  
-> hub clone nddrylliog/greg && cd greg  
-> make && sudo make install  
-
-> cd $OOC_DIR  
-> hub clone nddrylliog/nagaqueen  
-
-  * Now we'll grab oc, along with a frontend and a backend, and compile the shiznit out of it:
-
-> cd $OOC_DIR  
-> hub clone nddrylliog/oc  
-> hub clone nddrylliog/oc-nagaqueen  
-> hub clone nddrylliog/oc-c89  
-> export PREFIX=$OOC_DIR/oc/prefix  
-> cd oc-nagaqueen && ./make && cd ..  
-> cd oc-c89 && ./make && cd ..  
-> cd oc && ./make && sudo make install  
-
-  * If everything went fine, you should now be the happy owner of an oc setup!
-  * Since oc is entirely modular, feel free to write another frontend, or another
-    backend, and only recompile your code, not the main compiler. Yes, rock has
-    some pretty awesome sides as well.
+> make clean
 
 ## About the transition
 
-Oh who am I kidding, I'm changing ideas every 15 minutes anyway. We do thoroughly love zeromq lately, though :)
+Well, the project was abandoned for 2 years, but I'm sick of fixing rock
+bugs so I'm back on it for a while. Read the history of this file to
+have fun.
