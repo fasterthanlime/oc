@@ -4,7 +4,7 @@ import Statement, Type
 
 Expression: abstract class extends Statement {
 
-    type ::= getType()
+    type : Type { get { getType() } }
 
     /** to be implemented by subclassing fuckers */
     getType: abstract func -> Type
