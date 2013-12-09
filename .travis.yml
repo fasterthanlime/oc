@@ -6,7 +6,6 @@ before_install:
   - export PREFIX=myprefix
   - mkdir -p $PREFIX/bin
   - export PATH=$PATH:$PREFIX/bin
-  - mkdir $PREFIX
   - git clone --depth=1 git://github.com/nddrylliog/greg.git
   - (cd greg && make && make install)
   - git clone --depth=1 git://github.com/nddrylliog/nagaqueen.git
