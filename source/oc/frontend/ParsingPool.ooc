@@ -34,7 +34,7 @@ ParsingPool: class {
         todoMutex = Mutex new()
         factory = Plugins loadFrontend(params frontendString)
         if(!factory) {
-            fprintf(stderr, "Couldn't load frontend nagaqueen, bailing out\n")
+            "Couldn't load frontend #{params frontendString}, bailing out" println()
             exit(1)
         }
         factory setup(this)
@@ -114,7 +114,7 @@ ParserWorker: class {
                     pool done(job)
                     busy = false
                 } else {
-                    Time sleepMilli(10)
+                    Time sleepMilli(1000)
                 }
             }
 
