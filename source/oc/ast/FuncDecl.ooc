@@ -14,7 +14,7 @@ FuncDecl: class extends Expression {
     body := Scope new()
     args := HashMap<String, Var> new()
 
-    retType := VoidType new()
+    retType: Type { get set }
     _type: FuncType
 
     externName: String { get set }
@@ -27,6 +27,7 @@ FuncDecl: class extends Expression {
         name = ""
         externName = null
         _type = FuncType new(this)
+        retType = VoidType new()
     }
 
     anon?: func -> Bool {

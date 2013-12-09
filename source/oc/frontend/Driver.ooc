@@ -21,17 +21,17 @@ Driver: class {
         pool push(mainJob)
         pool exhaust()
 
+        params backend = Plugins loadBackend(params backendString)
+
+        mainJob module main? = true
+        Resolver new(params, mainJob module) start()
+
         if(params dump?) {
             pseudoBackend := Plugins loadBackend("pseudo")
             pool done each(|j| 
                 pseudoBackend process(j module, params)
             )
         }
-
-        params backend = Plugins loadBackend(params backendString)
-
-        mainJob module main? = true
-        Resolver new(params, mainJob module) start()
 
     }
 

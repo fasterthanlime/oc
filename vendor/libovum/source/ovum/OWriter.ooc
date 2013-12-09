@@ -1,6 +1,9 @@
-import io/Writer, structs/List
 
-OcWriter: class {
+// sdk
+import io/Writer
+import structs/[List, HashMap]
+
+OWriter: class {
 
     stream: Writer
     tabLevel := 0
@@ -25,12 +28,23 @@ OcWriter: class {
      * <left> elem0 <delim> elem1 <delim> elem2 <delim> elem3 <right>
      * f is passed every elem of list and is responsible of writing them
      */
-    writeEach: func <T> (list: List<T>, left, delim, right: String, f: Func(T)) {
+    writeEach: func ~list <T> (list: List<T>, left, delim, right: String, f: Func(T)) {
         app(left)
         first := true
         list each(|e|
             if(!first) app(delim)
             f(e)
+            first = false
+        )
+        app(right)
+    }
+
+    writeEach: func ~map <K, V> (hash: HashMap<K, V>, left, delim, right: String, f: Func (K, V)) {
+        app(left)
+        first := true
+        hash each(|k, v|
+            if(!first) app(delim)
+            f(k, v)
             first = false
         )
         app(right)

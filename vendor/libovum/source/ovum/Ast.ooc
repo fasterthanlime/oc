@@ -44,7 +44,7 @@ CSource: class extends CNode {
         baseFile := File new(basePath, name) parent
         if(!baseFile exists?()) baseFile mkdirs()
 
-        hw := OcWriter new(FileWriter new(File new(basePath, name + ".h")))
+        hw := OWriter new(FileWriter new(File new(basePath, name + ".h")))
 
         define := "__" + name map(|c| c alphaNumeric?() ? c toUpper() : '_') + "__define__"
         hw nl(). app("#ifndef "). app(define)
@@ -65,7 +65,7 @@ CSource: class extends CNode {
             hw app(';')
         )
 
-        cw := OcWriter new(FileWriter new(File new(basePath, name + ".c")))
+        cw := OWriter new(FileWriter new(File new(basePath, name + ".c")))
         cw nl(). app("#include \""). app(name). app(".h\"")
         cw nl(). app("#include <stdlib.h>")
 
@@ -76,7 +76,7 @@ CSource: class extends CNode {
         cw close()
     }
 
-    writeClosureType: func (w: OcWriter) {
+    writeClosureType: func (w: OWriter) {
         w app("
 struct Closure {
     int (*thunk)();
@@ -96,14 +96,14 @@ CFunction: class extends CNode {
 
     init: func (=returnType, =name) {}
 
-    writePrototype: func (w: OcWriter) {
+    writePrototype: func (w: OWriter) {
         returnType write(w, |w|
             w app(' '). app(name)
             w writeEach(args, "(", ", ", ")", |arg| arg write(w))
         )
     }
 
-    write: func (w: OcWriter) {
+    write: func (w: OWriter) {
     	w nl(). nl()
         writePrototype(w)
         w app(' ')
@@ -114,7 +114,7 @@ CFunction: class extends CNode {
 
 CStatement: abstract class extends CNode {
 
-    write: abstract func (oc: OcWriter)
+    write: abstract func (oc: OWriter)
 
 }
 
@@ -123,7 +123,7 @@ CBlock: class extends CStatement {
 
     init: func {}
 
-    write: func (w: OcWriter) {
+    write: func (w: OWriter) {
         w writeBlock(body, ";", |stat| stat write(w))
     }
 }
@@ -133,7 +133,7 @@ CIf: class extends CBlock {
 
     init: func (=cond) {}
 
-    write: func (w: OcWriter) {
+    write: func (w: OWriter) {
         w app("if(")
         cond write(w)
         w app(") ")
@@ -147,7 +147,7 @@ CReturn: class extends CStatement {
 
     init: func (=expr) {}
 
-    write: func (w: OcWriter) {
+    write: func (w: OWriter) {
         w app("return")
         if(expr) {
             w app(" ")
@@ -173,7 +173,7 @@ nop := CNop new()
 CNop: class extends CExpr {
     init: func
 
-    write: func (oc: OcWriter)
+    write: func (oc: OWriter)
 }
 
 var: func (type: CType, name: String) -> CVariable { CVariable new(type, name) }
@@ -188,7 +188,7 @@ CVariable: class extends CExpr {
 
     init: func(=type, =name) {}
 
-    write: func (w: OcWriter) {
+    write: func (w: OWriter) {
         type write(w, name)
         if(expr) {
             w app(" = ")
@@ -211,7 +211,7 @@ CAssign: class extends CExpr {
 
     init: func(=left, =right) {}
 
-    write: func (w: OcWriter) {
+    write: func (w: OWriter) {
         left write(w)
         w app(" = ")
         right write(w)
@@ -230,7 +230,7 @@ CAccess: class extends CExpr {
 
     init: func (=expr, =name) {}
 
-    write: func (w: OcWriter) {
+    write: func (w: OWriter) {
         if(expr) match expr {
             case d: CDeref =>
                 d expr write(w)
@@ -251,7 +251,7 @@ CAccess: class extends CExpr {
         expr: CExpr
         init: func (=expr) {}
 
-        write: func (w: OcWriter) {
+        write: func (w: OWriter) {
             match expr {
                 case addr: CAddressOf =>
                     addr expr write(w)
@@ -271,7 +271,7 @@ CAccess: class extends CExpr {
         expr: CExpr
         init: func (=expr) {}
 
-        write: func (w: OcWriter) {
+        write: func (w: OWriter) {
             match expr {
                 case addr: CAddressOf =>
                     addr expr write(w)
@@ -307,7 +307,7 @@ CAccess: class extends CExpr {
 
         init: func(=name) {}
 
-        write: func (w: OcWriter) {
+        write: func (w: OWriter) {
             if(fat) {
                 w app(name). app(".thunk("). app(name). app(".context")
                 if(args empty?())
@@ -333,7 +333,7 @@ CAccess: class extends CExpr {
 
         init: func (=val)
 
-        write: func (w: OcWriter) {
+        write: func (w: OWriter) {
             w app(val)
         }
 
@@ -346,14 +346,14 @@ CAccess: class extends CExpr {
 
         init: func(=val) {}
 
-        write: func (w: OcWriter) {
+        write: func (w: OWriter) {
             w app('"'). app(EscapeSequence escape(val)). app('"')
         }
     }
 
     CTypeDecl: abstract class {
 
-        write: abstract func (w: OcWriter)
+        write: abstract func (w: OWriter)
 
         getType: abstract func -> CType
         type: CType { get { getType() } }
@@ -371,7 +371,7 @@ CAccess: class extends CExpr {
             _type = CBaseType new("struct " + name)
         }
 
-        write: func (w: OcWriter) {
+        write: func (w: OWriter) {
             w nl(). nl(). app("struct "). app(name)
             w writeBlock(elements, ";", |stat| stat write(w))
             w app(';')
@@ -388,7 +388,7 @@ CAccess: class extends CExpr {
 
         init: func(=type) {}
 
-        write: func (w: OcWriter) {
+        write: func (w: OWriter) {
             w app("(")
             type write(w)
             w app(") ")
@@ -399,13 +399,13 @@ CAccess: class extends CExpr {
 
     CType: abstract class extends CExpr {
 
-        write: abstract func ~withAnon (w: OcWriter, writeMid: Func (OcWriter))
+        write: abstract func ~withAnon (w: OWriter, writeMid: Func (OWriter))
 
-        write: func ~withName (w: OcWriter, varName: String) {
+        write: func ~withName (w: OWriter, varName: String) {
             write(w, |w| w app(' '). app(varName))
         }
 
-        write: func (w: OcWriter) {
+        write: func (w: OWriter) {
             write(w, |w|)
         }
 
@@ -421,7 +421,7 @@ CAccess: class extends CExpr {
         name: String
         init: func(=name) {}
 
-        write: func ~withAnon (w: OcWriter, writeMid: Func (OcWriter)) {
+        write: func ~withAnon (w: OWriter, writeMid: Func (OWriter)) {
             w app(name)
             writeMid(w)
         }
@@ -437,7 +437,7 @@ CAccess: class extends CExpr {
 
         init: func (=retType) {}
 
-        write: func ~withAnon (w: OcWriter, writeMid: Func (OcWriter)) {
+        write: func ~withAnon (w: OWriter, writeMid: Func (OWriter)) {
             if(fat) {
                 w app("struct Closure")
                 writeMid(w)
@@ -457,7 +457,7 @@ CAccess: class extends CExpr {
         inner: CType
         init: func(=inner) {}
 
-        write: func ~withAnon (w: OcWriter, writeMid: Func (OcWriter)) {
+        write: func ~withAnon (w: OWriter, writeMid: Func (OWriter)) {
             inner write(w)
             w app('*')
             writeMid(w)
