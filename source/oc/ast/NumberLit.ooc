@@ -1,6 +1,6 @@
 
 import Expression, Type
-import middle/Resolver
+import oc/middle/Resolver
 
 /** Different number formats - in sync with nagaqueen's "IntFormat" */
 NumberFormat: enum {
@@ -15,15 +15,15 @@ NumberLit: class extends Expression {
     format: NumberFormat
     value: String
 
-    init: func (=format, =value) {
-        type = BaseType new("int") // well, maybe
-    }
+    _type := static BaseType new("int") // well, maybe
+
+    init: func (=format, =value)
 
     resolve: func (task: Task) {
         task queue(type)
     }
 
-    getType: func -> Type { type }
+    getType: func -> Type { _type }
 
     intValue: func -> LLong {
         value toLLong(format as Int)

@@ -3,11 +3,11 @@ import io/File
 
 import oc/middle/Resolver
 import oc/ast/Module
-import oc/DynamicLoader
+import oc/Plugins
 import oc/frontend/[ParsingPool, BuildParams]
 
 Driver: class {
-    
+
     compile: static func (file: String, params: BuildParams) {
 
         if(!File new(file) exists?()) {
@@ -21,16 +21,16 @@ Driver: class {
         pool push(mainJob)
         pool exhaust()
 
-	if(params dump?) {
-	    pseudoBackend := DynamicLoader loadBackend("pseudo", params)
-	    pool done each(|j| 
-		pseudoBackend process(j module, params)
-	    )
-	}
-        
+        if(params dump?) {
+            pseudoBackend := Plugins loadBackend("pseudo")
+            pool done each(|j| 
+                pseudoBackend process(j module, params)
+            )
+        }
+
         mainJob module main? = true
         Resolver new(params, mainJob module) start()
-        
+
     }
- 
+
 }

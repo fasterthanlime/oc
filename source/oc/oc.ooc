@@ -5,7 +5,6 @@ import structs/ArrayList
 import text/Opts
 
 import frontend/[BuildParams, Driver]
-import DynamicLoader
 
 main: func (mainArgs: ArrayList<String>) {
 
@@ -16,13 +15,9 @@ main: func (mainArgs: ArrayList<String>) {
         exit(1)
     }
     
-    DynamicLoader init(params)
-    
     args := opts args
     args each(|arg|
         Driver compile(arg, params)
     )
-    
-    DynamicLoader exit()
     
 }

@@ -3,3 +3,5 @@ Description: an ooc compiler
 SourcePath: source
 Main: oc/oc
 BinaryPath: bin/oc
+Libs: -lnagaqueen
+LibPaths: libs

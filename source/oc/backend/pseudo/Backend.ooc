@@ -1,13 +1,14 @@
 use oc
 
-import ast/[Module, Node, FuncDecl, Access, Var, Scope, Type,
-    Call, StringLit, NumberLit, Statement, Expression, Return, CoverDecl]
-import middle/Resolver
-
+// sdk
 import structs/[HashMap, ArrayList, List]
 
-import frontend/BuildParams
-import ../Backend
+// ours
+import oc/ast/[Module, Node, FuncDecl, Access, Var, Scope, Type,
+    Call, StringLit, NumberLit, Statement, Expression, Return, CoverDecl]
+import oc/middle/Resolver
+import oc/frontend/BuildParams
+import oc/backend/Backend
 
 /**
  * This backend outputs very simple pseudo-code: probably
@@ -22,8 +23,10 @@ CallBack: class {
 
 pseudo_Backend: class extends Backend {
 
+    init: func
+
     process: func (module: Module, params: BuildParams) {
-	PseudoGenerator new(module, params)	
+        PseudoGenerator new(module, params)	
     }
 
 }

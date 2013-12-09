@@ -1,9 +1,10 @@
 
-
+// sdk
 import structs/[ArrayList, HashMap]
 
+// ours
 import Expression, Scope, Type, Call
-import middle/Resolver
+import oc/middle/Resolver
 
 CoverDecl: class extends Expression {
 

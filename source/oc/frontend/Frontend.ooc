@@ -11,11 +11,11 @@ Frontend: abstract class {
     pool: ParsingPool
     
     /**
-     * Create a new frontend, able to parse .ooc files, attached to a given
+     * Set up a frontend, able to parse .ooc files, attached to a given
      * ParsingPool. The pool is used to trigger the parsing of imported .ooc
      * files
      */
-    init: func (=pool) {}
+    init: func (=pool)
     
     /**
      * Given the path to an .ooc file, the frontend should parse it and produce
@@ -27,8 +27,10 @@ Frontend: abstract class {
 }
 
 FrontendFactory: abstract class {
-    
-    init: func (pool: ParsingPool) {}
+
+    pool: ParsingPool
+
+    setup: func (=pool)
     
     create: abstract func -> Frontend
     

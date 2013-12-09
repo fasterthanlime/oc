@@ -1,9 +1,8 @@
 *_tmp
 .libs
-bin/*
-build/*
-plugins/*
-dammit
+libs
+bin
+build
 callgrind.out.*
 a.out
 *.so

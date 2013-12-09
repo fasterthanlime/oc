@@ -1,3 +1,0 @@
-#!/bin/bash
-
-find samples/ -maxdepth 2 -iname '*.ooc' -exec ./run-test '{}' \;

@@ -3,7 +3,7 @@ import io/File, os/Env, text/StringTokenizer
 import structs/[ArrayList, HashMap]
 
 import oc/backend/Backend
-import oc/DynamicLoader
+import oc/Plugins
 
 BUILD_DATE: extern CString
 

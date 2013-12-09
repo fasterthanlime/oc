@@ -3,7 +3,7 @@ import Frontend, BuildParams
 
 import oc/ast/[Module, Import]
 import oc/middle/Resolver
-import oc/DynamicLoader
+import oc/Plugins
 
 import threading/Thread, structs/[List, ArrayList], os/[Time, System]
 
@@ -22,7 +22,7 @@ ParsingPool: class {
     todo := ArrayList<ParsingJob> new()
     done := ArrayList<ParsingJob> new()
     workers := ArrayList<ParserWorker> new()
-    
+
     factory: FrontendFactory
 
     active := true
@@ -32,11 +32,12 @@ ParsingPool: class {
     init: func (params: BuildParams) {
         doneMutex = Mutex new()
         todoMutex = Mutex new()
-        factory = DynamicLoader loadFrontend(params frontendString, params, this)
+        factory = Plugins loadFrontend(params frontendString)
         if(!factory) {
             fprintf(stderr, "Couldn't load frontend nagaqueen, bailing out\n")
             exit(1)
         }
+        factory setup(this)
     }
 
     push: func (j: ParsingJob) {
@@ -120,6 +121,6 @@ ParserWorker: class {
             //"Dying [%d]" printfln(id)
         ) start()
     }
-    
+
 }
 
