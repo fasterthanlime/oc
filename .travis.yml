@@ -3,6 +3,11 @@ before_install:
   - sudo apt-get -y -qq install curl make libgc-dev
   - git clone --depth=1 git://github.com/nddrylliog/rock.git -b 99x
   - (cd rock && make -s rescue)
+  - export PREFIX=myprefix/
+  - export PATH=$PATH:$PREFIX/bin
+  - mkdir $PREFIX
+  - git clone --depth=1 git://github.com/nddrylliog/greg.git
+  - (cd greg && make && make install)
   - git clone --depth=1 git://github.com/nddrylliog/nagaqueen.git
   - export PATH=$PATH:$PWD/rock/bin
 
