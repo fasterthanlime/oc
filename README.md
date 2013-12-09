@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/nddrylliog/oc.png?branch=master)](https://travis-ci.org/nddrylliog/oc)
 
-# oc
+## oc
 
 oc is an [ooc][ooc] compiler written in ooc. It focuses on clean design,
 flexibility and scalability.
@@ -11,7 +11,7 @@ compiler. But then life happened. Now it's mostly a fun playground.
 [ooc]: http://ooc-lang.org
 [rock]: http://github.com/nddrylliog/rock
 
-## Building & installing
+### Building & installing
 
 Get a functional rock by following instructions:
 
@@ -27,7 +27,7 @@ If you fancy a bit of a cleanup, run
 
 > make clean
 
-## Licensing
+### Licensing
 
 oc is licensed under the MIT license. See the `LICENSE` file for details.
 
