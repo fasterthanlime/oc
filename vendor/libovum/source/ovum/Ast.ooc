@@ -412,6 +412,11 @@ CAccess: class extends CExpr {
         pointer: func -> CPointerType {
             CPointerType new(this)
         }
+
+        void?: func -> Bool {
+            false
+        }
+
     }
 
     type: func (name: String) -> CBaseType { CBaseType new(name) }
@@ -424,6 +429,10 @@ CAccess: class extends CExpr {
         write: func ~withAnon (w: OWriter, writeMid: Func (OWriter)) {
             w app(name)
             writeMid(w)
+        }
+
+        void?: func -> Bool {
+            name == "void"
         }
 
     }

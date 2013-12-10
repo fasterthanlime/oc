@@ -42,7 +42,7 @@ AstBuilder: class extends OocListener {
     init: func
 
     doParse: func (=module, path: String, =pool) {
-        stack push(module)
+        push(module)
         parse(path)
     }
 
@@ -53,19 +53,30 @@ AstBuilder: class extends OocListener {
     /**
      * Removes the head of the stack and return it
      */
-    pop: func <T> (T: Class) -> T {
+    pop: final func <T> (T: Class) -> T {
         v := stack pop()
-        if(!v instanceOf?(T)) Exception new("Expected " + T name + ", pop'd " + v class name) throw()
+        if(!v instanceOf?(T)) {
+            raise("Expected #{T name}, peek'd #{v class name}")
+        }
         v
     }
 
     /**
      * Returns the head of the stack without removing it
      */
-    peek: func <T> (T: Class) -> T {
+    peek: final func <T> (T: Class) -> T {
         v := stack peek()
-        if(!v instanceOf?(T)) Exception new("Expected " + T name + ", peek'd " + v class name) throw()
+        if(!v instanceOf?(T)) {
+            raise("Expected #{T name}, peek'd #{v class name}")
+        }
         v
+    }
+
+    /**
+     * Push something to the head of the stack
+     */
+    push: final func (obj: Object) {
+        stack push(obj)
     }
 
     /**
@@ -113,7 +124,7 @@ AstBuilder: class extends OocListener {
     onFunctionStart: func (name, doc: CString) {
         fd := FuncDecl new()
         fd name = name toString()
-        stack push(fd)
+        push(fd)
     }
 
     onFunctionEnd: func -> FuncDecl {
@@ -128,7 +139,7 @@ AstBuilder: class extends OocListener {
     }
 
     onFunctionArgsStart: func {
-        stack push(peek(FuncDecl) args)
+        push(peek(FuncDecl) args)
     }
 
     onFunctionArgsEnd: func {
@@ -158,7 +169,7 @@ AstBuilder: class extends OocListener {
      */
 
     onFunctionCallStart: func (name: CString) {
-        stack push(Call new(Access new(null, name toString())))
+        push(Call new(Access new(null, name toString())))
     }
 
     onFunctionCallArg: func (arg: Expression) {
@@ -176,7 +187,7 @@ AstBuilder: class extends OocListener {
     /* Variable declarations */
 
     onVarDeclStart: func {
-        stack push(VarStack new())
+        push(VarStack new())
     }
 
     onVarDeclEnd: func -> Object {
@@ -202,7 +213,7 @@ AstBuilder: class extends OocListener {
     /* Covers */
 
     onCoverStart: func (name, doc: CString) {
-        stack push(CoverDecl new())
+        push(CoverDecl new())
     }
 
     onCoverEnd: func -> Object {
@@ -222,12 +233,13 @@ AstBuilder: class extends OocListener {
     }
 
     onFuncTypeGenericArgument: func (type: FuncType, name: CString) {
-        "Got generic argument <%s> for funcType %s" printfln(name, type toString())
+        "[STUB] Got generic argument <#{name}> for funcType #{type}" println()
     }
 
     onFuncTypeArgument: func (funcType: FuncType, argType: Type) {
-        "Got typeArgument %s" printfln(argType toString())
-        funcType proto args put("", v := Var new(""). setType(argType))
+        v := Var new("")
+        v setType(argType)
+        funcType proto args put("", v)
     }
 
     onFuncTypeVarArg: func (funcType: Object) {
@@ -235,14 +247,22 @@ AstBuilder: class extends OocListener {
     }
 
     onFuncTypeReturnType: func (funcType: FuncType, returnType: Type) {
-        "Got returnType %s" printfln(returnType toString())
         funcType proto retType = returnType
     }
 
     /* Various expression/statements */
 
-    onStringLiteral: func (text: CString) -> StringLit {
-        StringLit new(text toString())
+    onStringLiteralStart: func {
+        push(StringLit new(""))
+    }
+
+    onStringTextChunk: func (text: CString) {
+        sl := peek(StringLit)
+        sl value = sl value + text toString()
+    }
+
+    onStringLiteralEnd: func -> StringLit {
+        pop(StringLit)
     }
 
     onIntLiteral: func (format: IntFormat, value: CString) -> NumberLit {

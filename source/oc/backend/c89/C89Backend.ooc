@@ -288,7 +288,13 @@ C89Generator: class extends StackGenerator {
                 cf args add(v)
                 call args add(CAccess new(ctxVar acc() deref(), acc name))
             )
-            shim body add(call)
+
+            if (cf returnType void?()) {
+                shim body add(call)
+            } else {
+                ret := CReturn new(call)
+                shim body add(ret)
+            }
 
             source types add(ctx)
             source functions add(shim)
