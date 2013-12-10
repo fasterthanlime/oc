@@ -3,6 +3,7 @@ NAGAQUEEN_DIR ?= ../nagaqueen
 NAGAQUEEN_LEG := ${NAGAQUEEN_DIR}/grammar/nagaqueen.leg
 NAGAQUEEN_C := source/oc/frontend/nagaqueen/NagaQueen.c
 NAGAQUEEN_LIB := libs/libnagaqueen.a
+OOC_FLAGS ?= -vv -pg -O3 +-w
 
 .PHONY: oc clean
 
@@ -10,7 +11,7 @@ all: $(NAGAQUEEN_LIB) oc
 
 oc:
 	@echo "Compiling oc..."
-	rock -v
+	rock $(OOC_FLAGS)
 
 clean:
 	rock -x

@@ -201,11 +201,6 @@ C89Generator: class extends StackGenerator {
                         cif body addAll(visitScope(bif body))
                         cif
                     case =>	 
-                        if(v expr) {
-                            "Calling %s, acc ref is %s of type %s" printfln(acc name, v expr toString(), v expr class name)
-                        } else {
-                            "Calling %s, acc ref is %s, no expr" printfln(acc name, acc ref toString())
-                        }
                         if(!v expr || v expr class != FuncDecl) {
                             cc fat = true
                         }
