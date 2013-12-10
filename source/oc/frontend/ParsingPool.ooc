@@ -114,7 +114,7 @@ ParserWorker: class {
                     pool done(job)
                     busy = false
                 } else {
-                    Time sleepMilli(1000)
+                    Time sleepMilli(10)
                 }
             }
 

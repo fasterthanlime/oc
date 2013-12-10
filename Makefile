@@ -3,7 +3,7 @@ NAGAQUEEN_DIR ?= ../nagaqueen
 NAGAQUEEN_LEG := ${NAGAQUEEN_DIR}/grammar/nagaqueen.leg
 NAGAQUEEN_C := source/oc/frontend/nagaqueen/NagaQueen.c
 NAGAQUEEN_LIB := libs/libnagaqueen.a
-OOC_FLAGS ?= -vv -pg -O3 +-w
+OOC_FLAGS ?= -vv -pg -O3 +-w --nolines
 
 .PHONY: oc clean
 

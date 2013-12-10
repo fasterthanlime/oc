@@ -154,7 +154,6 @@ C89Generator: class extends StackGenerator {
     }
 
     visitModule: func (m: Module) {
-        ("Visiting module " + m fullName) println()
         loadFunc = CFunction new(type("void"), "__" + m fullName map(|c| c alphaNumeric?() ? c : '_') + "__")
         source functions add(loadFunc)
 

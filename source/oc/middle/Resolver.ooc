@@ -8,14 +8,14 @@ import oc/frontend/BuildParams
 Task: class {
     resolver: Resolver
 
-    id: Int { get set }
+    id: Int
     idSeed := static 0
 
     parent: Task
     parentCoro, coro: Coro
 
-    node: Node { get set }
-    done?: Bool { get set }
+    node: Node
+    done?: Bool
 
     userdata: HashBag
 
@@ -49,34 +49,33 @@ Task: class {
     /**
      * Set userdata to this task
      */
-    set: func <T> (key: String, value: T) {
+    set: final func <T> (key: String, value: T) {
         if(!userdata) userdata = HashBag new()
         userdata put(key, value)
     }
 
-    unset: func (key: String) {
+    unset: final func (key: String) {
         if(!userdata) return
         userdata remove(key)
     }
 
-    has: func (key: String) -> Bool {
+    has: final func (key: String) -> Bool {
         if(!userdata) return false
         userdata contains?(key)
     }
 
-    get: func <T> (key: String, T: Class) -> T {
+    get: final func <T> (key: String, T: Class) -> T {
         if(userdata) {
             return userdata get(key, T)
         } else null
     }
 
-    start: func {
+    start: final func {
         version(OOC_TASK_DEBUG) { (toString() + " started") println() }
 
-        // Adjust the stackbottom and add our Coro's stack as a root for the GC
         parentCoro startCoro(coro, ||
             // This allows us to reuse tasks
-            while(this node != null) {
+            while (this node != null) {
                 version(OOC_TASK_DEBUG) { (toString() + " launching resolve of " + toString()) println() }
                 this node resolve(this)
                 version(OOC_TASK_DEBUG) { (toString() + " finished, yielding " + toString()) println() }
@@ -88,12 +87,12 @@ Task: class {
         )
     }
 
-    yield: func {
+    yield: final func {
         version(OOC_TASK_DEBUG) { (toString() + " yield") println() }
         coro switchTo(parentCoro)
     }
 
-    queue: func (n: Node) {
+    queue: final func (n: Node) {
         task := Task new(this, n)
         version(OOC_TASK_DEBUG) { (toString() + " queuing " + n toString() + " with " + task toString()) println() }
         task start()
@@ -104,19 +103,19 @@ Task: class {
         }
     }
 
-    queueList: func (l: Iterable<Node>) {
-        pool := ArrayList<Node> new()
+    queueList: final func (l: Iterable<Node>) {
+        pool := ArrayList<Task> new()
         l each(|n, i| spawn(n, i, pool))
         exhaust(pool)
     }
 
-    queueAll: func (f: Func (Func (Node, Int))) {
-        pool := ArrayList<Node> new()
+    queueAll: final func (f: Func (Func (Node, Int))) {
+        pool := ArrayList<Task> new()
         f(|n, i| spawn(n, i, pool))
         exhaust(pool)
     }
 
-    spawn: func (n: Node, index: Int, pool: List<Task>) {
+    spawn: final func (n: Node, index: Int, pool: List<Task>) {
         version(OOC_TASK_DEBUG) {  (toString() + " spawning for " + n toString()) }
         task := Task new(this, n)
         task set("index", index)
@@ -124,33 +123,35 @@ Task: class {
         if(!task done?) pool add(task)
     }
 
-    exhaust: func (pool: List<Task>) {
+    exhaust: final func (pool: List<Task>) {
         version(OOC_TASK_DEBUG) { (toString() + " exhausting pool ") println() }
-        while(!pool empty?()) {
-            oldPool := pool
-            pool = ArrayList<Task> new()
 
-            oldPool each(|task|
+        nextPool := ArrayList<Task> new()
+        while(!pool empty?()) {
+            pool each(|task|
                 version(OOC_TASK_DEBUG) {  (toString() + " switching to unfinished task " + task toString()) println() }
                 switchTo(task)
                 if(!task done?) {
-                    pool add(task)
+                    nextPool add(task)
                 }
             )
 
-            if(!pool empty?()) {
+            if(!nextPool empty?()) {
                 yield()
             }
+
+            pool clear()
+            (pool, nextPool) = (nextPool, pool)
         }
     }
 
-    need: func (f: Func -> Bool) {
+    need: final func (f: Func -> Bool) {
         while(!f()) {
             yield()
         }
     }
 
-    switchTo: func (task: Task) {
+    switchTo: final func (task: Task) {
         coro switchTo(task coro)
     }
 
@@ -158,14 +159,14 @@ Task: class {
         "[#%d %s]" format(id, node ? node toString() : "<no node>")
     }
 
-    walkBackward: func (f: Func (Node) -> Bool) {
+    walkBackward: final func (f: Func (Node) -> Bool) {
         if(f(node)) return // true = break
         if(parent) {
             parent walkBackward(f)
         }
     }
 
-    walkBackwardTasks: func ~withTask (f: Func (Task) -> Bool) {
+    walkBackwardTasks: final func ~withTask (f: Func (Task) -> Bool) {
         if(f(this)) return // true = break
         if(parent) {
             parent walkBackwardTasks(f)
@@ -195,21 +196,11 @@ Resolver: class extends Node {
         modules addAll(mainModule getDeps())
     }
 
-    start: func {
-        "Resolver started, with %d module(s)!" printfln(modules size)
+    start: func (parentCoro: Coro) {
+        "Resolving #{modules size} module(s)..." printfln(modules size)
 
-        mainCoro := Coro new()
-        mainCoro initializeMainCoro()
-
-        mainTask := Task new(this, mainCoro, this)
+        mainTask := Task new(this, parentCoro, this)
         mainTask start()
-        while(!mainTask done?) {
-            "" println()
-            "========================== Looping! ===============" println()
-            "" println()
-
-            mainCoro switchTo(mainTask coro)
-        }
     }
 
     resolve: func (task: Task) {

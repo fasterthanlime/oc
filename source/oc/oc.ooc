@@ -1,12 +1,18 @@
 
 use oc
 
+// sdk
 import structs/ArrayList
 import text/Opts
+import os/Coro
 
-import frontend/[BuildParams, Driver]
+// ours
+import oc/frontend/[BuildParams, Driver]
+import oc/structs/NStructs
 
 main: func (mainArgs: ArrayList<String>) {
+    mainCoro := Coro new()
+    mainCoro initializeMainCoro()
 
     opts := Opts new(mainArgs)
     params := BuildParams new(opts opts)
@@ -16,9 +22,8 @@ main: func (mainArgs: ArrayList<String>) {
         exit(1)
     }
     
-    args := opts args
-    args each(|arg|
-        Driver compile(arg, params)
+    opts args each(|arg|
+        Driver compile(arg, params, mainCoro)
     )
     
 }
