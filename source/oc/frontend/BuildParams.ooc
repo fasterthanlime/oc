@@ -9,7 +9,7 @@ BUILD_DATE: extern CString
 
 BuildParams: class {
 
-    VERSION := static "0.0"
+    VERSION := static "0.1.0"
 
     self := ""
     home := "."

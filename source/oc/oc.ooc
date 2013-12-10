@@ -18,7 +18,9 @@ main: func (mainArgs: ArrayList<String>) {
     params := BuildParams new(opts opts)
 
     if(opts args empty?()) {
-        "Usage: oc file.ooc" println()
+        "Usage: oc FILE" println()
+        "Where FILE is a .use file or an .ooc file" println()
+        "If no file is specified, the first .use file found will be compiled." println()
         exit(1)
     }
     
