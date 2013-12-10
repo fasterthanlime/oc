@@ -23,6 +23,7 @@ PreprocessorReader: class extends FileReader {
 
 Header: class {
 
+    debug := false
     path: String
     fR: FileReader
     symbols := HashMap<String, String> new()
@@ -51,6 +52,7 @@ Header: class {
     }
 
     parse: func {
+        "Parsing #{path}" println()
         lastId: String
 
         while(fR hasNext?()) {
@@ -61,7 +63,8 @@ Header: class {
             match (c1 := fR read()) {
                 case '#' =>
                     skipWhitespace()
-                    //"[%d] Skipping directive #%s" printfln(mark, fR readWhile(|c| !c whitespace?()))
+                    dir := fR readWhile(|c| !c whitespace?())
+                    log("Skipping directive #{dir}")
                     skipLine()
                 case '(' =>
                     parenCount := 1
@@ -71,13 +74,33 @@ Header: class {
                             case ')' => parenCount -= 1; true
                             case     => parenCount > 0
                         }
-                    ) replaceAll("\n", "")
-                    //"[%d] Got symbol %s(%s" printfln(mark, lastId, call)
+                    ) replaceAll("\n", "") trimRight(")")
+                    log("Got symbol #{lastId}(#{call})")
                     symbols put(lastId, call)
+                case '{' =>
+                    braceCount := 1
+                    fR readWhile(|c|
+                        match c {
+                            case '{' => braceCount += 1; true
+                            case '}' => braceCount -= 1; true
+                            case     => braceCount > 0
+                        }
+                    )
+                    log("Skipped braces to #{fR mark()}")
+                case '[' =>
+                    braceCount := 1
+                    fR readWhile(|c|
+                        match c {
+                            case '[' => braceCount += 1; true
+                            case ']' => braceCount -= 1; true
+                            case     => braceCount > 0
+                        }
+                    )
+                    log("Skipped square braces to #{fR mark()}")
                 case ';' =>
-                    //"[%d] End of line, should probably handle stuff, just skipping for now!" printfln(mark)
+                    log("End of line, should probably handle stuff, just skipping for now!")
                 case '*' =>
-                    //"[%d] Pointer type, maybe? got *" printfln(mark)
+                    log("Pointer type, maybe? got *")
                 case =>
                     fR rewind(1)
 
@@ -89,23 +112,28 @@ Header: class {
                                 skipWhitespace()
                                 id2 := readIdentifier()
                                 if(!id2) {
-                                    "[%d] Aborting on unfinished struct" printfln(mark)
+                                    log("Aborting on unfinished struct")
                                     return
                                 }
-                                //"[%d] Got type 'struct %s'" printfln(mark, id2)
+                                log("Got type 'struct #{id2}'")
                             case =>
-                                //"[%d] Got '%s'" printfln(mark, id)
+                                log("Got '#{id}'")
                         }
                     } else if(c1 whitespace?()) {
                         // skip
-                        //"[%d] Skipping whitespace" printfln(fR mark())
+                        log("Skipping whitespace")
                         fR read(). read()
                     } else {
-                        "[%d] Aborting on unknown char '%c', (code %d)" printfln(mark, c1, c1 as Int)
+                        log("Aborting on unknown char '%c' (code %d)" format(c1, c1 as Int))
                         return
                     }
             }
         }
+
+        "Read #{symbols size} symbols: " println()
+        symbols each(|name, val|
+            "'#{name}' => '#{val}'" println()
+        )
     }
 
     readIdentifier: func -> String {
@@ -130,7 +158,6 @@ Header: class {
     }
 
     skipComments: func {
-
         while(true) {
             skipWhitespace()
 
@@ -150,6 +177,12 @@ Header: class {
 
             fR reset(mark)
             break
+        }
+    }
+
+    log: final func (message: String) {
+        if (debug) {
+            "[#{fR mark()}] #{message}" println()
         }
     }
 
