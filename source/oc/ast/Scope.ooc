@@ -24,7 +24,7 @@ Scope: class extends Node {
 
         if(task has("noindex")) {
             size := body size
-            idx = size
+            idx = size - 1
         } else {
             previous := task
             task walkBackwardTasks(|t|
@@ -40,7 +40,7 @@ Scope: class extends Node {
             }
         }
 
-        // idx + 1 to allow recursion, of course :)
+        // idx + 1 to allow calling self
         for(i in 0..(idx + 1)) {
             node := body[i]
             match (node class) {
