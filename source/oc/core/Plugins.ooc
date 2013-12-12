@@ -3,9 +3,9 @@
 import structs/[ArrayList, HashMap]
 
 // ours
-import frontend/Frontend
-import backend/Backend
-import core/BuildParams
+import oc/core/BuildParams
+import oc/frontend/Frontend
+import oc/backend/Backend
 
 // enabled backends
 import oc/backend/c89/c89glue

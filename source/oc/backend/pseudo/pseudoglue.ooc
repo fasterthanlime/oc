@@ -1,5 +1,5 @@
 
-import oc/Plugins
+import oc/core/Plugins
 import oc/backend/pseudo/PseudoBackend
 
 // let's register ourselves with oc

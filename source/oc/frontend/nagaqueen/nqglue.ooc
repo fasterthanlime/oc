@@ -1,5 +1,5 @@
 
-import oc/Plugins
+import oc/core/Plugins
 import oc/frontend/nagaqueen/NQFrontend
 
 // let's register ourselves with oc

@@ -4,7 +4,7 @@ import io/File
 import os/Coro
 
 // ours
-import oc/Plugins
+import oc/core/Plugins
 import oc/core/BuildParams
 import oc/frontend/ParsingPool
 import oc/ast/Module

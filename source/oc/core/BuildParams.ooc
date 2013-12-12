@@ -5,8 +5,8 @@ import structs/[ArrayList, HashMap]
 import os/Coro
 
 // ours
+import oc/core/Plugins
 import oc/backend/Backend
-import oc/Plugins
 
 /**
  * Build parameters

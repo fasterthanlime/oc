@@ -1,5 +1,5 @@
 
-import oc/Plugins
+import oc/core/Plugins
 import oc/backend/c89/C89Backend
 
 // let's register ourselves with oc

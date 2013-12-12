@@ -6,10 +6,9 @@ import os/[Time, System]
 
 // ours
 import oc/core/BuildParams
-
+import oc/core/Plugins
 import oc/frontend/Frontend
 import oc/ast/[Module, Import]
-import oc/Plugins
 
 /**
  * .ooc file that needs to be parsed
