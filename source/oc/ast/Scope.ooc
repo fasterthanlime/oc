@@ -1,5 +1,5 @@
 
-import structs/[ArrayList, List]
+import structs/ArrayList
 
 import oc/middle/Resolver
 
@@ -8,7 +8,7 @@ import Node, Statement, Var, Access
 
 Scope: class extends Node {
 
-    body: List<Statement> { get set }
+    body: ArrayList<Statement> { get set }
 
     init: func {
         body = ArrayList<Statement> new()
@@ -41,8 +41,11 @@ Scope: class extends Node {
         }
 
         // idx + 1 to allow calling self
-        for(i in 0..(idx + 1)) {
-            node := body[i]
+        nodes := body data as Node*
+
+        limit := idx + 1
+        for(i in 0..limit) {
+            node := nodes[i]
             match (node class) {
                 case Var =>
                     v := node as Var
