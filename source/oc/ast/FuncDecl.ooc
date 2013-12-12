@@ -6,7 +6,7 @@ import structs/[ArrayList, HashMap]
 import oc/middle/Resolver
 
 import Inquisitor
-import Node, Expression, Statement, Scope, Var, Type, Access, Return, Call
+import Node, Symbol, Expression, Statement, Scope, Var, Type, Access, Return, Call
 
 FuncDecl: class extends Expression {
 
@@ -57,13 +57,10 @@ FuncDecl: class extends Expression {
 
         match (task parent node) {
             case c: Call =>
-                "Parent of %s is call %s" printfln(toString(), c toString())
-                while(c subject ref == null) {
-                    "ref = %s" printfln(c subject ref ? c subject ref toString() : "(nil)")
-                    "C subject's ref is null, yielding" println()
-                    task parent queue(c subject)
-                    "Back here!" println()
-                }
+                "Parent of #{this} is call #{c}" println()
+                task queue(c subject)
+                task need(|| c subject type != null)
+                "Can finally infer type!" println()
                 inferType(c)
         }
 
@@ -71,43 +68,43 @@ FuncDecl: class extends Expression {
     }
 
     inferType: func (outerCall: Call) {
-        "outerCall = %s" printfln(outerCall toString())
+        "outerCall = #{outerCall}" println()
 
         // idx is our position in the call arguments, or -1 if we're not an argument of outerCall
         idx := outerCall args indexOf(this)
         if(idx == -1) {
-            "Decl %s is a child of task for call %s but it's not in its arguments!" printfln(toString(), outerCall toString())
+            "Decl #{this} is a child of task for call #{outerCall} but it's not in its arguments!" println()
             return
         }
-        "idx = %d" printfln(idx)
+        "idx = #{idx}" println()
 
         // callRef is the Var that our outer call's subject has been resolved to
-        callRef := outerCall subject ref
+        callRef := outerCall subject sym ref
         if(!callRef getType() instanceOf?(FuncType)) {
-            Exception new("Should never happen: outer call %s was resolved to something that's not a function! (ie. %s)" \
-                format(outerCall toString(), callRef getType() toString())) throw()
+            raise("Should never happen: outer call #{outerCall} was resolved to something \
+                that's not a function! (ie. #{callRef getType()})")
         }
-        "callRef = %s" printfln(callRef toString())
+        "callRef = #{callRef}" println()
 
         // callProto is the FuncDecl which defines the argument types of the reference of the outer call
         callProto := callRef getType() as FuncType proto
-        "callProto = %s" printfln(callRef toString())
+        "callProto = #{callRef}" println()
 
         // outerType is the type that the outer call expects us to be. Our actual type is getType()
         outerType := callProto args get(callProto args getKeys() get(idx)) getType()
         if(!outerType instanceOf?(FuncType)) {
-            Exception new("Passing a function (ie. %s) to a %s where expecting a %s (%s)" format(toString(), callProto toString(), outerType toString(), outerType class name)) throw()
+            raise("Passing a function (ie. #{this}) to a #{callProto} where expecting a #{outerType} (#{outerType class name})")
         }
-        "outerType = %s" printfln(outerType toString())
+        "outerType = #{outerType}" println()
 
         outerProto := outerType as FuncType proto
-        "outerProto = %s" printfln(outerProto toString())
+        "outerProto = #{outerProto}" println()
 
         if(outerProto args size != args size) {
-            Exception new("Function %s is not compatible with type %s" format(toString(), outerProto toString())) throw()
+            raise("Function #{this} is not compatible with type #{outerProto}")
         }
 
-        "Inferring return type of %s to be %s" printfln(toString(), outerProto retType toString())
+        "Inferring return type of #{this} to be #{retType}" println()
         retType = outerProto retType
     }
 
@@ -115,8 +112,7 @@ FuncDecl: class extends Expression {
         if(!retType void?()) {
             list := body body
             if(list empty?()) {
-                "Expected return expression in non-void function %s" printfln(name)
-                exit(1)
+                raise("Expected return expression in non-void function #{name}")
             } else {
                 last := list last()
                 if(last class == Return) {
@@ -124,16 +120,18 @@ FuncDecl: class extends Expression {
                 } else if(last instanceOf?(Expression)) {
                     list set(list size - 1, Return new(last as Expression))
                 } else {
-                    "Expected return expression in non-void function %s" printfln(name)
-                    exit(1)
+                    raise("Expected return expression in non-void function #{name}")
                 }
             }
         }
     }
 
-    resolveAccess: func (acc: Access, task: Task, suggest: Func (Var)) {
-        v := args get(acc name)
-        if(v) suggest(v)
+    findSym: func (name: String, task: Task, suggest: Func (Symbol) -> Bool) -> Bool {
+        v := args get(name)
+        if(v) {
+            return suggest(v symbol())
+        }
+        false
     }
 
     toString: func -> String {

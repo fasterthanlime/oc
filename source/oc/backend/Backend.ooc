@@ -1,6 +1,6 @@
 
 // ours
-import oc/ast/[Module, Access, Var]
+import oc/ast/[Symbol, Module, Access, Var]
 import oc/middle/Resolver
 import oc/core/BuildParams
 
@@ -29,8 +29,8 @@ Backend: abstract class {
      * For example, a C backend might automatically be aware of C types from
      * parsing header files, and allow resolving of those names automatically.
      */
-    resolveAccess: func (acc: Access, task: Task, suggest: Func (Var)) {
-        "resolveAccess(%s) in %s" printfln(acc toString(), class name)
+    findSym: func (name: String, task: Task, suggest: Func (Symbol) -> Bool) -> Bool {
+        false
     }
 
 }

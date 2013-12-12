@@ -5,7 +5,7 @@ import structs/[ArrayList, HashMap]
 // ours
 import oc/middle/Resolver
 
-import Node, Expression, Scope, Type, Call
+import Node, Symbol, Expression, Scope, Type, Call
 
 CoverDecl: class extends Expression {
 

@@ -4,7 +4,7 @@ import structs/[ArrayList, List]
 
 // urs
 import oc/middle/Resolver
-import Node, FuncDecl, Call, Import, Scope, Access, Var
+import Node, Symbol, Import, Scope
 
 /**
  * A module contains types, functions, global variables.
@@ -44,20 +44,20 @@ Module: class extends Node {
         list
     }
 
-    resolveAccess: func (acc: Access, task: Task, suggest: Func (Var)) {
-        //"Resolving %s in %s, with %d import, task is %s" printfln(acc toString(), toString(), imports size, task toString())
+    findSym: func (name: String, task: Task, suggest: Func (Symbol) -> Bool) -> Bool {
+        "findSym(#{name}, ...) in #{this}, with #{imports size} import, task is #{task}" println()
 
         task set("noindex", true)
         for(imp in imports) {
-            imp module body resolveAccess(acc, task, suggest)
-            if(acc ref) break
+            res := imp module body findSym(name, task, suggest)
+            if (res) return true
         }
         task unset("noindex")
 
-        if(!acc ref) {
-            // combo X5!
-            task resolver params backend resolveAccess(acc, task, suggest)
-        }
+        // still not resolved?
+        task resolver params backend findSym(name, task, suggest)
+
+        false
     }
 
     toString: func -> String {

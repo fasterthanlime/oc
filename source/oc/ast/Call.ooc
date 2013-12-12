@@ -4,12 +4,12 @@ import structs/[List, ArrayList]
 import oc/middle/Resolver
 
 import Inquisitor
-import FuncDecl, Expression, Access, Type
+import Symbol, FuncDecl, Expression, Access, Type
 
 Call: class extends Expression {
 
-    subject: Access { get set }
-    args: List<Expression> { get set }
+    subject: Access
+    args: List<Expression>
 
     init: func (=subject) {
         args = ArrayList<Expression> new()

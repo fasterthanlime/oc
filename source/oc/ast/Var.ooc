@@ -3,7 +3,7 @@
 import oc/middle/Resolver
 
 import Inquisitor
-import Node, Type, Expression
+import Node, Symbol, Type, Expression
 
 Var: class extends Expression {
 

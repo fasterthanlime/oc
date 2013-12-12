@@ -6,7 +6,7 @@ import structs/[ArrayList, HashMap]
 import oc/middle/Resolver
 
 import Inquisitor
-import Expression, Node, Statement, Var, Access
+import Symbol, Node, Statement, Var, Access
 
 /**
  * Any block (list of nodes), really.
@@ -44,10 +44,14 @@ Scope: class extends Node {
         task queueList(body)
     }
 
-    resolveAccess: func (acc: Access, task: Task, suggest: Func (Var)) {
-        if (!symbols) return
+    findSym: func (name: String, task: Task, suggest: Func (Symbol) -> Bool) -> Bool {
+        "#{this} findSym(#{name}, ...)" println()
 
-        sym := symbols get(acc name)
+        if (!symbols) {
+            return false
+        }
+
+        sym := symbols get(name)
 
         if (sym) {
             if (task has("noindex")) {
@@ -58,6 +62,7 @@ Scope: class extends Node {
                 previous := task
                 task walkBackwardTasks(|t|
                     if (t node == this) {
+                        "walked backward to find #{this}, found previous #{previous}" println()
                         idx = previous get("index", Int)
                         return true
                     }
@@ -66,61 +71,16 @@ Scope: class extends Node {
                 )
                 if (idx < sym index) {
                     "> #{idx} < #{sym index}, not visible at this point in scope" println()
-                    return // not found, don't resolve
+                    // not found, don't resolve
+                    return false
                 }
             }
 
-            ref := sym sym ref
-            match ref {
-                // ideally, suggest would accept anything, as we don't want to
-                // only resolve accesses, but calls, etc.
-                case var: Var =>
-                    suggest(var)
-            }
+            if (suggest(sym sym)) return true
         }
+
+        false
     }
-
-    /*
-    resolveAccess: func (acc: Access, task: Task, suggest: Func (Var)) {
-        idx := -1
-        //"Looking for %s in %s" printfln(acc toString(), toString())
-
-        if(task has("noindex")) {
-            size := body size
-            idx = size - 1
-        } else {
-            previous := task
-            task walkBackwardTasks(|t|
-                if(t node == this) {
-                    idx = previous get("index", Int)
-                    return true
-                }
-                previous = t
-                false
-            )
-            if(idx == -1) {
-                return // not found, don't resolve
-            }
-        }
-
-        // idx + 1 to allow calling self
-        nodes := body data as Node*
-
-        limit := idx + 1
-        for(i in 0..limit) {
-            node := nodes[i]
-            match (node class) {
-                case Var =>
-                    v := node as Var
-                    if(v name == acc name) {
-                        suggest(v)
-                    }
-            }
-        }
-    }
-    */
-
-    accessResolver?: func -> Bool { true }
 
     add: func (s: Statement) {
         body add(s)

@@ -1,9 +1,12 @@
 
+// ours
 import oc/middle/Resolver
 import Inquisitor
+import Symbol
 
-import Access, Var // for resolveAccess
-
+/**
+ * Mother to all AST nodes
+ */
 Node: class {
 
     resolve: func (task: Task) {
@@ -16,10 +19,8 @@ Node: class {
 
     callResolver?: func -> Bool { false }
 
-    accessResolver?: func -> Bool { false }
-
-    resolveAccess: func (acc: Access, task: Task, suggest: Func (Var)) {
-        // <your ad here>
+    findSym: func (name: String, task: Task, suggest: Func (Symbol) -> Bool) -> Bool {
+        false
     }
 
     surrender: func (inq: Inquisitor) {
@@ -29,17 +30,6 @@ Node: class {
     symbol: func -> Symbol {
         (null, null) as Symbol
     }
-
-}
-
-/**
- * A symbol - e.g. a variable definition, type definition,
- * function definition, etc.
- */
-Symbol: cover {
-
-    name: String
-    ref: Node
 
 }
 

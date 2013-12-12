@@ -12,8 +12,8 @@ import StackGenerator
 import ovum/[Ast, HeaderParser]
 
 import oc/core/BuildParams
-import oc/ast/[Module, Node, FuncDecl, Access, Var, Scope, Type,
-       Call, StringLit, NumberLit, Statement, Expression, Return]
+import oc/ast/[Symbol, Module, Node, FuncDecl, Access, Var, Scope, Type, Call,
+       StringLit, NumberLit, Statement, Expression, Return]
 import oc/middle/Resolver
 import oc/backend/Backend
 
@@ -53,9 +53,9 @@ BuiltinIf: class extends Var {
         fDecl args put(v name, v)
 
         if(!body body empty?() && body body last() instanceOf?(Expression)) {
-            expr := body body last() as Expression 
+            expr := body body last() as Expression
             if(expr getType() != null) {
-                fDecl retType = expr getType() 
+                fDecl retType = expr getType()
             }
         }
         FuncType new(fDecl)
@@ -72,19 +72,27 @@ c89_Backend: class extends Backend {
         C89Generator new(module, params)
     }
 
-    resolveAccess: func (acc: Access, task: Task, suggest: Func (Var)) {
+    findSym: func (name: String, task: Task, suggest: Func (Symbol) -> Bool) -> Bool {
         if(!headers) {
             headers = HashMap<String, Header> new()
         }
 
+        done := false
+
         // ifTrue is a built-in conditional
-        if(acc name == "ifTrue") {
+        if(name == "ifTrue") {
             task walkBackward(|node|
                 match node {
                     case call: Call =>
                         if (call args size == 1 && call args[0] instanceOf?(FuncDecl)) {
                             fDecl := call args[0] as FuncDecl
-                            suggest(BuiltinIf new(acc expr, fDecl body))
+                            match (task node) {
+                                case acc: Access =>
+                                    bIf := BuiltinIf new(acc expr, fDecl body)
+                                    done = suggest(bIf symbol())
+                                case =>
+                                    raise("Invalid usage of iTrue: #{task node}")
+                            }
                         }
                         true
                     case =>
@@ -92,6 +100,8 @@ c89_Backend: class extends Backend {
                 }
             )
         }
+
+        if (done) return true
 
         // get functions from C headers
         task walkBackward(|node|
@@ -102,17 +112,19 @@ c89_Backend: class extends Backend {
                         header = Header find(inc + ".h")
                         if(header) headers put(inc, header)
                     }
-                    if(header != null && header symbols contains?(acc name)) {
-                        "Found function `%s` in header `%s`" printfln(acc name, header path)
-                        v := Var new(acc name)
+                    if(header != null && header symbols contains?(name)) {
+                        "Found function `%s` in header `%s`" printfln(name, header path)
+                        v := Var new(name)
                         fd := FuncDecl new()
-                        fd externName = acc name
+                        fd externName = name
                         v expr = fd
-                        suggest(v)
+                        suggest(v symbol())
                     }
                 );	    true
-                case => false 
+                case => false
             })
+
+        false
     }
 
 }
@@ -189,15 +201,14 @@ C89Generator: class extends StackGenerator {
         match (c subject) {
             case acc: Access =>
                 cc := CCall new(acc name)
-                v := acc ref
+                ref := acc sym ref
 
-                match (v class) {
-                    case BuiltinIf =>
-                        bif := v as BuiltinIf
+                match ref {
+                    case bif: BuiltinIf =>
                         cif := CIf new(visitExpr(bif cond))
                         cif body addAll(visitScope(bif body))
                         cif
-                    case =>	 
+                    case v: Var =>
                         if(!v expr || v expr class != FuncDecl) {
                             cc fat = true
                         }
@@ -211,7 +222,7 @@ C89Generator: class extends StackGenerator {
 
     visitVar: func (v: Var) -> CVariable {
         match (v expr) {
-            case null =>    	           
+            case null =>
                 var(ctype(v type), v name)
             case =>
                 cv := var(ctype(v type), v name)
@@ -280,11 +291,16 @@ C89Generator: class extends StackGenerator {
             call := CCall new(name)
 
             fd accesses each(|acc|
-                v := visitVar(acc ref)
-                ctx elements add(v)
-                ctxLiteral elements add(CAccess new(null, acc name))
-                cf args add(v)
-                call args add(CAccess new(ctxVar acc() deref(), acc name))
+                match (acc sym ref) {
+                    case var: Var =>
+                        v := visitVar(var)
+                        ctx elements add(v)
+                        ctxLiteral elements add(CAccess new(null, acc name))
+                        cf args add(v)
+                        call args add(CAccess new(ctxVar acc() deref(), acc name))
+                    case =>
+                        raise("Unsupported sym ref: #{acc sym ref}")
+                }
             )
 
             if (cf returnType void?()) {
