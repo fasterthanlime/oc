@@ -61,8 +61,14 @@ ParamsParser: class {
                 params backendString = val
             case "dump" =>
                 params dump? = true
+            case "q" || "quiet" =>
+                params verbose = -1
             case "v" || "verbose" =>
-                params verbose += 1
+                params verbose = 1
+            case "vv" || "verboser" =>
+                params verbose = 2
+            case "vvv" || "veryVerbose" =>
+                params verbose = 3
             case "V" =>
                 params specialTask = SpecialTask VERSION
             case "x" =>

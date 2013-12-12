@@ -13,7 +13,7 @@ import oc/core/[BuildParams, CompileJob]
  */
 Core: class {
 
-    OC_VERSION := static "0.2.0"
+    OC_VERSION := static "0.2.1"
 
     mainCoro, motherCoro: Coro
     opts: Opts
