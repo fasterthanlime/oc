@@ -1,0 +1,5 @@
+Name: libuse
+Version: 0.1
+Description: A library to deal with ooc .use files
+SourcePath: source
+

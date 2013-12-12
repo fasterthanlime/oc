@@ -4,11 +4,15 @@ import io/File
 import os/Coro
 
 // ours
-import oc/middle/Resolver
-import oc/ast/Module
 import oc/Plugins
-import oc/frontend/[ParsingPool, BuildParams]
+import oc/core/BuildParams
+import oc/frontend/ParsingPool
+import oc/ast/Module
+import oc/middle/Resolver
 
+/**
+ * Drives the compilation of a program or library
+ */
 Driver: class {
 
     compile: static func (oocPath: String, params: BuildParams, parentCoro: Coro) {

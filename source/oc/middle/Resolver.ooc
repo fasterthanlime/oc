@@ -1,10 +1,18 @@
 
+// sdk
 import os/Coro, structs/[ArrayList, List, Stack, HashBag]
 
+// ours
 import oc/ast/[Node, Module]
 import oc/backend/Backend
-import oc/frontend/BuildParams
+import oc/core/BuildParams
 
+/**
+ * The whole resolution / desugaring / checking process
+ * happens within Tasks in oc. Tasks are basically coroutines
+ * on steroids - they can queue other tasks, wait for them,
+ * in the order which a program requires.
+ */
 Task: class {
     resolver: Resolver
 
@@ -14,11 +22,16 @@ Task: class {
     parent: Task
     parentCoro, coro: Coro
 
+    /** Node doing this task */
     node: Node
-    done?: Bool
 
+    // state
+
+    done?: Bool
     userdata: HashBag
 
+    // pool of recently finished tasks to be re-used
+    // instead of creating new coroutines
     lastFree := static Stack<This> new()
 
     init: func ~real (=parent, .node, dummy: Bool) {
@@ -186,6 +199,10 @@ ModuleTask: class extends Node {
     }
 }
 
+/**
+ * Special AST node whose purpose is to resolve all
+ * nodes in our compile job.
+ */
 Resolver: class extends Node {
 
     modules: ArrayList<Module> { get set }

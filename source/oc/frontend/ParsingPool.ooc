@@ -1,12 +1,19 @@
 
-import Frontend, BuildParams
+// sdk
+import threading/Thread
+import structs/[List, ArrayList]
+import os/[Time, System]
 
+// ours
+import oc/core/BuildParams
+
+import oc/frontend/Frontend
 import oc/ast/[Module, Import]
-import oc/middle/Resolver
 import oc/Plugins
 
-import threading/Thread, structs/[List, ArrayList], os/[Time, System]
-
+/**
+ * .ooc file that needs to be parsed
+ */
 ParsingJob: class {
 
     path: String
@@ -17,6 +24,9 @@ ParsingJob: class {
 
 }
 
+/**
+ * Handles parallel parsing of .ooc files
+ */
 ParsingPool: class {
 
     todo := ArrayList<ParsingJob> new()
@@ -86,6 +96,9 @@ ParsingPool: class {
 
 }
 
+/**
+ * Worker thread able to parse modules from a parsing job pool.
+ */
 ParserWorker: class {
 
     idSeed : static Int = 0

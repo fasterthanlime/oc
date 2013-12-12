@@ -3,29 +3,30 @@
 import structs/[ArrayList, HashMap]
 
 // ours
+import frontend/Frontend
 import backend/Backend
-import frontend/BuildParams
-
-import frontend/[ParsingPool, Frontend]
+import core/BuildParams
 
 // enabled backends
 import oc/backend/c89/c89glue
 import oc/backend/pseudo/pseudoglue
 import oc/frontend/nagaqueen/nqglue
 
+/**
+ * Ideally, plug-ins would be loaded as dynamic libraries,
+ * as it was once in oc. Nowadays it's mostly just 'packages'
+ * which register themselves.
+ *
+ * Front-ends handle the "source code => AST" side of things.
+ * Back-ends handle the "AST => compiler object" part of thing,
+ * where a compiler object might be some sort of library or
+ * executable, and where a backend might use some sort of
+ * intermediary representation.
+ */
 Plugins: class {
 
     frontends := HashMap<String, FrontendFactory> new()
     backends := HashMap<String, Backend> new()
-
-    instance: static This
-
-    get: static func -> This {
-        if (!instance) {
-            instance = new()
-        }
-        instance
-    }
 
     init: func
 
@@ -51,6 +52,19 @@ Plugins: class {
             "Couldn't find backend '#{name}'" println()
         }
         res
+    }
+
+    /*
+     * Private stuff (mostly shingleton (sic.) pattern).
+     */
+
+    instance: static This
+
+    get: static func -> This {
+        if (!instance) {
+            instance = new()
+        }
+        instance
     }
 
 }

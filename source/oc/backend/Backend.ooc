@@ -1,9 +1,11 @@
+
+// ours
 import oc/ast/[Module, Access, Var]
 import oc/middle/Resolver
-import oc/frontend/BuildParams
+import oc/core/BuildParams
 
 /**
- * Interface for pluggable backends in oc-c89
+ * Interface for pluggable backends in oc
  */
 Backend: abstract class {
     

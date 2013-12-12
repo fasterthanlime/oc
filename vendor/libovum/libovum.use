@@ -1,3 +1,4 @@
 Name: libovum
-Description: libcee's half-twin
+Version: 0.1
+Description: libcee's half-twin, to deal with the C language
 SourcePath: source

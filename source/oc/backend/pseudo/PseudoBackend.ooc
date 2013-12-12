@@ -1,3 +1,4 @@
+
 use oc, libovum
 
 // sdk
@@ -5,11 +6,11 @@ import structs/[HashMap, ArrayList, List]
 import io/BufferWriter
 
 // ours
+import oc/core/BuildParams
 import oc/ast/[Inquisitor]
 import oc/ast/[Module, Node, FuncDecl, Access, Var, Scope, Type,
        Call, StringLit, NumberLit, Statement, Expression, Return, CoverDecl]
 import oc/middle/Resolver
-import oc/frontend/BuildParams
 import oc/backend/Backend
 
 // third
