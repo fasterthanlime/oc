@@ -1,10 +1,12 @@
 
+// sdk
 import structs/[ArrayList, HashMap]
 
+// ours
 import oc/middle/Resolver
 
 import Inquisitor
-import Expression, Statement, Scope, Var, Type, Access, Return, Call
+import Node, Expression, Statement, Scope, Var, Type, Access, Return, Call
 
 FuncDecl: class extends Expression {
 
@@ -154,6 +156,10 @@ FuncDecl: class extends Expression {
 
     surrender: func (inq: Inquisitor) {
         inq visitFuncDecl(this)
+    }
+
+    symbol: func -> Symbol {
+        (name, this) as Symbol
     }
 
 }

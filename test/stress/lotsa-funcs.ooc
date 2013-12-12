@@ -1,11 +1,6 @@
 
 printf: extern func ()
 
-
-
-
-
-
 main: func {
     printf(); printf(); printf(); printf(); printf(); printf(); printf(); printf(); printf(); printf(); printf()
     printf(); printf(); printf(); printf(); printf(); printf(); printf(); printf(); printf(); printf(); printf()

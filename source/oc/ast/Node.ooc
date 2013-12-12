@@ -26,4 +26,20 @@ Node: class {
         raise("#{class name} surrender(): stub!")
     }
 
+    symbol: func -> Symbol {
+        (null, null) as Symbol
+    }
+
 }
+
+/**
+ * A symbol - e.g. a variable definition, type definition,
+ * function definition, etc.
+ */
+Symbol: cover {
+
+    name: String
+    ref: Node
+
+}
+

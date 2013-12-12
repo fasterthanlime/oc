@@ -1,9 +1,9 @@
 
-
+// ours
 import oc/middle/Resolver
 
 import Inquisitor
-import Type, Expression
+import Node, Type, Expression
 
 Var: class extends Expression {
 
@@ -40,6 +40,10 @@ Var: class extends Expression {
 
     surrender: func (inq: Inquisitor) {
         inq visitVar(this)
+    }
+
+    symbol: func -> Symbol {
+        (name, this) as Symbol
     }
 
 }

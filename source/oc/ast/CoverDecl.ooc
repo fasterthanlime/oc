@@ -3,8 +3,9 @@
 import structs/[ArrayList, HashMap]
 
 // ours
-import Expression, Scope, Type, Call
 import oc/middle/Resolver
+
+import Node, Expression, Scope, Type, Call
 
 CoverDecl: class extends Expression {
 
@@ -31,6 +32,10 @@ CoverDecl: class extends Expression {
 
     getType: func -> Type {
         _type
+    }
+
+    symbol: func -> Symbol {
+        (name, this) as Symbol
     }
 
 }
