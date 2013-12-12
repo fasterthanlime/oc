@@ -194,7 +194,6 @@ ModuleTask: class extends Node {
 
     resolve: func (task: Task) {
         task queue(module)
-        "Finished resolving %s!" printfln(module fullName)
         task resolver params backend process(module, task resolver params)
     }
 }
@@ -214,7 +213,9 @@ Resolver: class extends Node {
     }
 
     start: func (parentCoro: Coro) {
-        "Resolving #{modules size} module(s)..." printfln(modules size)
+        if (params verbose > 0) {
+            "Resolving #{modules size} module(s)..." println()
+        }
 
         mainTask := Task new(this, parentCoro, this)
         mainTask start()

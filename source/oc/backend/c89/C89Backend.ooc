@@ -147,9 +147,8 @@ C89Generator: class extends StackGenerator {
         )
         push(source)
         visitModule(module)
-        "Compiling %s, outpath = %s" printfln(module fullName, params outpath)
+        if (params verbose > 1) "Compiling #{module fullName}, outpath = #{params outpath}" println()
         peek(CSource) write(params outpath)
-        "Done compiling" println()
     }
 
     visitModule: func (m: Module) {

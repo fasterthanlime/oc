@@ -32,13 +32,14 @@ ParsingPool: class {
     done := ArrayList<ParsingJob> new()
     workers := ArrayList<ParserWorker> new()
 
+    params: BuildParams
     factory: FrontendFactory
 
     active := true
 
     doneMutex, todoMutex: Mutex
 
-    init: func (params: BuildParams) {
+    init: func (=params) {
         doneMutex = Mutex new()
         todoMutex = Mutex new()
         factory = Plugins loadFrontend(params frontendString)
@@ -118,7 +119,7 @@ ParserWorker: class {
                 job := pool pop()
                 if(job) {
                     busy = true
-                    "Parsing %s [%d]" printfln(job path, id)
+                    if (pool params verbose > 1) "Parsing #{job path} [#{id}]" println()
                     builder := pool factory create()
                     builder parse(job path)
                     job module = builder module

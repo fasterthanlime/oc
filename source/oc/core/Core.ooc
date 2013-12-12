@@ -15,7 +15,7 @@ Core: class {
 
     OC_VERSION := static "0.2.0"
 
-    mainCoro: Coro
+    mainCoro, motherCoro: Coro
     opts: Opts
     params := BuildParams new()
 
@@ -26,6 +26,14 @@ Core: class {
         opts = Opts new(mainArgs)
         ParamsParser new(params, opts opts)
 
+        motherCoro = Coro new()
+        mainCoro startCoro(motherCoro, ||
+            work()
+            exit(0)
+        )
+    }
+
+    work: func {
         match (params specialTask) {
             case SpecialTask VERSION =>
                 doVersion()
@@ -63,7 +71,7 @@ Core: class {
     }
 
     compileArg: func (arg: String) {
-        job := CompileJob new(params, mainCoro, arg)
+        job := CompileJob new(params, motherCoro, arg)
         job launch()
     }
 }
