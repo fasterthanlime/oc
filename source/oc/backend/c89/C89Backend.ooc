@@ -95,10 +95,8 @@ c89_Backend: class extends Backend {
 
         // get functions from C headers
         task walkBackward(|node|
-            this; acc; suggest // workaround powa!
             match (node) {
                 case m: Module => m includes each(|inc|
-                    this; acc; suggest // workaround powa
                     header := headers get(inc)
                     if(header == null) {
                         header = Header find(inc + ".h")
