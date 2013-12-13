@@ -44,6 +44,7 @@ CompileJob: class {
 
         if (isUse) {
             useFile = UseFile new(file)
+            exit(1)
         }
     }
 
